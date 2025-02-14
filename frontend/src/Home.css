@@ -1,0 +1,430 @@
+/* General Container */
+.home-container {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-height: 100vh; /* Ensure the container takes at least full viewport height */
+}
+
+/* Left Side: Form */
+.task-form-container {
+  width: 300px; /* Adjust this width to your preference */
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 8px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh; /* Ensure it stays full height */
+  overflow-y: auto;
+  z-index: 10; /* Ensure form stays above other content */
+}
+
+/* Task Form */
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.task-form input,
+.task-form textarea {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.3s ease;
+  resize: vertical;
+}
+
+.task-form input:focus,
+.task-form textarea:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+.add-task-btn {
+  padding: 12px;
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.add-task-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Right Side: Task List Container */
+.task-list-container {
+  margin-left: 320px; /* Adjusted based on the form width */
+  padding: 20px;
+  width: calc(100% - 320px); /* Ensure it takes the full width excluding the form */
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  min-height: 100vh; /* Ensures it takes full height */
+  gap: 20px; /* Added space between task columns */
+  background-color: #f9f9f9; /* Ensure the background covers the container */
+  box-sizing: border-box; /* Account for padding in the width calculation */
+  margin-top: 20px; /* Added margin-top to avoid overlap with the fixed form */
+  z-index: 5; /* Ensure the task list stays below the form */
+}
+
+/* Column for Each Task Status */
+.status-column {
+  flex: 1;
+  padding: 10px;
+  background-color: #fff; /* Ensure the column background is white */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: auto; /* Remove the fixed height */
+  min-height: 400px; /* Optional: Ensure columns have a minimum height */
+  overflow-y: auto; /* Make each status column scrollable */
+  min-width: 250px; /* Ensure a minimum width for columns */
+  border-right: 1px solid #ddd; /* Vertical line between columns */
+}
+
+/* Column Header (Fixed) */
+.status-column h2 {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  border-bottom: 2px solid #ddd; /* Line below the header */
+  z-index: 1; /* Ensure the heading stays above the tasks */
+  margin: 0;
+}
+
+/* Task Item */
+.task-item {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Full width in the container */
+  max-width: 350px; /* Optional max width for the tile */
+  min-height: 250px; /* Optional: Minimum height for task items */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 15px; /* Space between task tiles */
+  box-sizing: border-box; /* Include padding and border in width/height */
+}
+
+/* Header Section with Separator Line */
+.task-item-header {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd; /* Line below the title */
+  padding-bottom: 10px;
+}
+
+/* Task Content Section */
+.task-item-content {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+  overflow-y: auto; /* Allow content to scroll if needed */
+  flex-grow: 1; /* Allow content to take up available space */
+}
+
+/* Task Status Section */
+.task-status {
+  margin-top: 10px;
+}
+
+/* Hover Effect for Task Item */
+.task-item:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Optional: Adjust content inside the task item */
+.task-item .task-content {
+  overflow-y: auto; /* Allow content inside task to scroll if needed */
+  max-height: 100%;
+}
+
+/* Ensure the task title and content fit */
+.task-item h3 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.task-item p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Status Dropdown */
+.status-dropdown {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  margin-top: 5px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.status-dropdown:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Loading & Empty State */
+p {
+  text-align: center;
+  color: #888;
+  font-size: 16px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Spaces out the content, pushing title to the left and button to the right */
+  align-items: center; /* Vertically centers the items */
+  padding: 10px 20px; /* Adds padding to the navbar */
+  background-color: white; /* Dark background color */
+  color: white; /* Text color */
+  font-size: 16px;
+  margin-top: -20px;
+  margin-left: 15px;
+}
+
+.navHomeRoleTitle {
+  margin: 0;
+  font-weight: bold;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #e74c3c; /* Red background for logout button */
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-left: 200px;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b; /* Darker red on hover */
+}
+
+@media (max-width: 768px) {
+  .home-container {
+      flex-direction: column;
+      padding: 10px;
+  }
+
+  .task-form-container {
+      position: static;
+      width: 100%;
+      padding: 10px;
+      border-right: none;
+  }
+
+  .task-list-container {
+      margin-left: 0;
+      width: 100%;
+  }
+
+  .status-column {
+      width: 100%;
+      margin-bottom: 20px;
+  }
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.bid-card {
+  background: #f9f9f9;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Accept Bid Button */
+.accept-btn {
+  background-color: #28a745;  /* Green background */
+  color: white;               /* White text */
+  font-size: 16px;            /* Font size */
+  padding: 10px 20px;         /* Padding */
+  border: none;               /* Remove default border */
+  border-radius: 5px;         /* Rounded corners */
+  cursor: pointer;           /* Pointer on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+/* Hover effect */
+.accept-btn:hover {
+  background-color: #218838;  /* Darker green on hover */
+  transform: translateY(-2px); /* Slight raise effect */
+}
+
+/* Focus effect */
+.accept-btn:focus {
+  outline: none;  /* Remove focus outline */
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5); /* Green glow */
+}
+
+.bid-status-text.accepted {
+  color: green;
+  font-weight: bold;
+}
+
+.bid-status-text.rejected {
+  color: red;
+  font-weight: bold;
+}
+
+.bid-status-text.pending {
+  color: orange;
+  font-weight: bold;
+}
+
+.navHomeRoleTitle {
+  margin-left: 320px;
+}
+
+/* Accept Bid Button */
+.reject-btn {
+  background-color: red;  /* Green background */
+  color: white;               /* White text */
+  font-size: 16px;            /* Font size */
+  padding: 10px 20px;         /* Padding */
+  border: none;               /* Remove default border */
+  border-radius: 5px;         /* Rounded corners */
+  cursor: pointer;           /* Pointer on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+  margin-left: 200px;
+}
+
+/* Hover effect */
+.reject-btn:hover {
+  background-color: red;  /* Darker green on hover */
+  transform: translateY(-2px); /* Slight raise effect */
+}
+
+/* Focus effect */
+.reject-btn:focus {
+  outline: none;  /* Remove focus outline */
+  box-shadow: 0 0 0 2px rgba(231, 21, 49, 0.5); /* Green glow */
+}
+
+.search-bar {
+  padding: 9px 20px;
+  margin-left: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width:300px;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.category-filter {
+  padding: 9px 20px;
+  margin-left: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width:110px;
+}
+
+.category-filter:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.tag-filter {
+  padding: 9px 20px;
+  margin-left: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width:110px;
+}
+
+.tag-filter:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
