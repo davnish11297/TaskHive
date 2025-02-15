@@ -7,11 +7,16 @@ const taskRoutes = require('./routes/taskRoutes');
 const { request } = require('express');
 const mongoose = require('mongoose');
 
+const allowedOrigins = [
+  "http://localhost:3000", 
+  "https://taskhive-frontend-6uz2diami-davnish11297s-projects.vercel.app"
+];
+
 // Middleware to parse JSON
 app.use(express.json());
 
 const cors = require('cors');
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // API routes
 app.use('/api/auth', require('./routes/authRoutes'));
