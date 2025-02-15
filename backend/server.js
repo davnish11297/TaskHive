@@ -9,7 +9,8 @@ const mongoose = require('mongoose');
 
 const allowedOrigins = [
   "http://localhost:3000", 
-  "https://taskhive-frontend-6uz2diami-davnish11297s-projects.vercel.app"
+  "https://taskhive-frontend-6uz2diami-davnish11297s-projects.vercel.app",
+  "https://taskhive-frontend.vercel.app/"
 ];
 
 // Middleware to parse JSON
