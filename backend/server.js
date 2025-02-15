@@ -29,17 +29,17 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api', taskRoutes);
 
 // Serve static files (React app) after API routes
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'frontend', 'build')));
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
-  // If any route does not match API, serve React app
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
-  });
-} else {
-  // In development, serve React app directly from the frontend folder
-  app.use(express.static(path.join(__dirname, 'frontend', 'public')));
-}
+//   // If any route does not match API, serve React app
+//   app.get('*', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+//   });
+// } else {
+//   // In development, serve React app directly from the frontend folder
+//   app.use(express.static(path.join(__dirname, 'frontend', 'public')));
+// }
 
 mongoose.connect('mongodb+srv://sdavnish:davnish7@cluster0.dfy8i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
     serverSelectionTimeoutMS: 30000,
