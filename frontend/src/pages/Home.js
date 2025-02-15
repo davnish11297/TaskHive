@@ -96,7 +96,7 @@ const Home = () => {
 
     const handleCreateTask = async (e) => {
         e.preventDefault();
-        if (!newTask.title.trim() || !newTask.description.trim() || !newTask.deadline) {
+        if (!newTask.title.trim() || !newTask.description.trim() || !newTask.deadline || !newTask.category) {
             alert('Please fill in all required fields.');
             return;
         }
@@ -334,14 +334,15 @@ const Home = () => {
                         <option value="COMPLETED">Completed</option>
                     </select>
 
-                    <input
-                        type="text"
-                        name="category"
-                        value={newTask.category}
-                        onChange={handleChange}
-                        placeholder="Task Category"
-                        required
-                    />
+                    <select className="category-dropdown"
+                        value={newTask.category || ''} 
+                        onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
+                    >
+                        <option value="">Select a category</option>
+                        <option value="Web Development">Web Development</option>
+                        <option value="Graphic Design">Graphic Design</option>
+                        <option value="Writing">Writing</option>
+                    </select>
                     
                     <input
                         type="text"
