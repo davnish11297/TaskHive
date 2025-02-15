@@ -30,6 +30,14 @@ const Home = () => {
     const [tagFilter, setTagFilter] = useState('');
     const [user, setUser] = useState('');
 
+    const if_live = true;
+
+    if (if_live === true) {
+        const API_URL = "https://taskhive-d0c8.onrender.com";
+    } else {
+        const API_URL = "http://localhost:5001";
+    }
+
     useEffect(() => {
         if (userToken) {
             const decodedToken = jwtDecode(userToken); // Decode the JWT token
@@ -45,7 +53,7 @@ const Home = () => {
             if (categoryFilter) query.push(`category=${categoryFilter}`);
             if (tagFilter) query.push(`tag=${tagFilter}`);
 
-            const response = await axios.get(`http://localhost:5001/api/tasks?${query.join('&')}`, {
+            const response = await axios.get(`${API_URL}/api/tasks?${query.join('&')}`, {
                 headers: { Authorization: `Bearer ${userToken}` },
             });
 
@@ -99,7 +107,7 @@ const Home = () => {
         console.log(user)
 
         try {
-            await axios.post('http://localhost:5001/api/tasks', newTask, {
+            await axios.post(`${API_URL}/api/tasks`, newTask, {
                 headers: { Authorization: `Bearer ${userToken}` },
             });
 
@@ -123,7 +131,7 @@ const Home = () => {
     const handleStatusChange = async (taskId, newStatus) => {
         try {
             await axios.patch(
-                `http://localhost:5001/api/tasks/${taskId}/status`,
+                `${API_URL}/api/tasks/${taskId}/status`,
                 { status: newStatus.toUpperCase() },
                 {
                     headers: {
@@ -145,7 +153,7 @@ const Home = () => {
     const handleAcceptBid = async (taskId, bidId) => {
         try {
             await axios.patch(
-                `http://localhost:5001/api/tasks/accept/${bidId}`,
+                `${API_URL}/api/tasks/accept/${bidId}`,
                 { bidId },
                 {
                     headers: {
@@ -167,7 +175,7 @@ const Home = () => {
     const handleBid = async (taskId, bidAmount, estimatedCompletion, message) => {
         try {
             const response = await axios.post(
-                `http://localhost:5001/api/tasks/${taskId}/bid`,
+                `${API_URL}/api/tasks/${taskId}/bid`,
                 { bidAmount, estimatedCompletion, message },
                 { headers: { 
                     Authorization: `Bearer ${token}`,
@@ -235,7 +243,7 @@ const Home = () => {
     const handleTaskClick = async (task) => {
         setSelectedTask(task);
         try {
-            const response = await axios.get(`http://localhost:5001/api/tasks/${task._id}/bids`, {
+            const response = await axios.get(`${API_URL}/api/tasks/${task._id}/bids`, {
                 headers: { Authorization: `Bearer ${userToken}` },
             });
             console.log(response.data)
@@ -255,7 +263,7 @@ const Home = () => {
         try {
             // Make an API call to reject the bid
             const response = await axios.patch(
-                `http://localhost:5001/api/tasks/reject/${bidId}`,
+                `${API_URL}/api/tasks/reject/${bidId}`,
                 {}, // No body needed, assuming you only need the bid ID for rejection
                 {
                     headers: {
