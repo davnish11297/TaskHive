@@ -44,10 +44,33 @@ router.post('/register', async (req, res) => {
   });
 
 router.post('/login', async (req, res) => {
+    console.log("Login request received:", req.body);
+
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      console.log("Missing email or password:", { email, password });
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
     const user = await User.findOne({ email });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user) {
+      console.log("User not found for email:", email);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    console.log("User found:", user);
+
+    if (!user.password) {
+        console.log("User password is missing!");
+        return res.status(500).json({ message: 'Server error: password missing' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+        console.log("Password does not match");
         return res.status(400).json({ message: 'Invalid credentials' });
     }
 
