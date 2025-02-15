@@ -31,12 +31,9 @@ const Home = () => {
     const [user, setUser] = useState('');
 
     const if_live = true;
-
-    if (if_live === true) {
-        const API_URL = "https://taskhive-d0c8.onrender.com";
-    } else {
-        const API_URL = "http://localhost:5001";
-    }
+    const API_URL = if_live 
+        ? "https://taskhive-d0c8.onrender.com" 
+        : "http://localhost:5001";
 
     useEffect(() => {
         if (userToken) {
