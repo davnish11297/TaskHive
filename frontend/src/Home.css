@@ -543,3 +543,18 @@ p {
       max-width: 100%;
   }
 }
+
+.category-dropdown {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  margin-top: 5px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.category-dropdown:focus {
+  outline: none;
+  border-color: #007bff;
+}
