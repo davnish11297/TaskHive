@@ -3,6 +3,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../../src/Login.css';
 
+const if_live = true;
+
+if (if_live === true) {
+    const API_URL = "https://taskhive-d0c8.onrender.com";
+} else {
+    const API_URL = "http://localhost:5001";
+}
+
 const Login = () => {
     const [formData, setFormData] = useState({
         email: '',
@@ -25,7 +33,7 @@ const Login = () => {
         console.log('Form submitted, sending API request');
 
         try {
-            const response = await axios.post('http://localhost:5001/api/auth/login', formData);
+            const response = await axios.post(`${API_URL}/api/auth/login`, formData);
             console.log(response.data)
             const { token } = response.data;
             localStorage.setItem('token', token);

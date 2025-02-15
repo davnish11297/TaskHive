@@ -3,6 +3,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../../src/Register.css';
 
+const if_live = true;
+
+if (if_live === true) {
+    const API_URL = "https://taskhive-d0c8.onrender.com";
+} else {
+    const API_URL = "http://localhost:5001";
+}
+
 const Register = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -25,7 +33,7 @@ const Register = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:5001/api/auth/register', formData);
+            const response = await axios.post(`${API_URL}/api/auth/register`, formData);
             const { token } = response.data;
             localStorage.setItem('token', token);
             navigate('/home');
