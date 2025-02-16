@@ -17,12 +17,14 @@ const allowedOrigins = [
 app.use(express.json());
 
 const cors = require('cors');
-app.use(cors({
-  origin: allowedOrigins, 
-  methods: "GET,POST,PUT,DELETE,PATCH",
-  allowedHeaders: "Content-Type,Authorization",
-  credentials: true
-}));
+// app.use(cors({
+//   origin: allowedOrigins, 
+//   methods: "GET,POST,PUT,DELETE,PATCH",
+//   allowedHeaders: "Content-Type,Authorization",
+//   credentials: true
+// }));
+
+app.use(cors());
 
 // API routes
 app.use('/api/auth', require('./routes/authRoutes'));
