@@ -12,7 +12,7 @@ const FRONT_END_URL = if_live
 ? "https://taskhive-frontend-6uz2diami-davnish11297s-projects.vercel.app" 
 : "http://localhost:5001";
 
-const Login = () => {
+const Login = ({ setIsAuthenticated }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -38,8 +38,8 @@ const Login = () => {
             console.log(response.data)
             const { token } = response.data;
             localStorage.setItem('token', token);
+            setIsAuthenticated(true);
             navigate('/home');
-            console.log('Navigation executed');
         } catch (error) {
             console.error("Login error", error);
             setError('Error logging in. Please try again.');
