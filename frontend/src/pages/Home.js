@@ -101,7 +101,7 @@ const Home = () => {
             return;
         }
 
-        console.log(user)
+        console.log("Task being sent:", newTask); // Check if category exists
 
         try {
             await axios.post(`${API_URL}/api/tasks`, newTask, {
