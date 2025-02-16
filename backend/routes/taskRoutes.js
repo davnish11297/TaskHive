@@ -7,7 +7,7 @@ const router = express.Router();
 // Create a new task
 router.post('/tasks', async (req, res) => {
     try {
-      const { title, description, userId, budget, deadline, status } = req.body;
+      const { title, description, userId, budget, deadline, category, tags, status } = req.body;
 
       // Validate the input for status to ensure it's one of the valid options
       const validStatuses = ['PENDING', 'IN_PROGRESS', 'COMPLETED'];
@@ -15,7 +15,7 @@ router.post('/tasks', async (req, res) => {
         return res.status(400).json({ error: 'Invalid status value' });
       }
 
-      const newTask = new Task({ title, description, budget, deadline, status, user: userId });
+      const newTask = new Task({ title, description, budget, deadline, status, category, tags, user: userId });
       await newTask.save();
       res.status(201).json(newTask);
     } catch (error) {
