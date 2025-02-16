@@ -582,26 +582,6 @@ const Home = () => {
                                             </p>
                                         )}
 
-                                        {/* Tags */}
-                                        <div className="task-tags">
-                                            {task.tags && task.tags.length > 0 ? (
-                                                task.tags.map((tag, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="task-tag"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // Prevent opening the bidding modal
-                                                            if (!selectedTags.includes(tag)) {
-                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
-                                                            }
-                                                        }}
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))
-                                            ) : null}
-                                        </div>
-
                                         <div className="task-status">
                                             <select
                                                 className="status-dropdown"
@@ -668,26 +648,6 @@ const Home = () => {
                                                 {task.category}
                                             </p>
                                         )}
-
-                                        {/* Tags */}
-                                        <div className="task-tags">
-                                            {task.tags && task.tags.length > 0 ? (
-                                                task.tags.map((tag, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="task-tag"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // Prevent opening the bidding modal
-                                                            if (!selectedTags.includes(tag)) {
-                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
-                                                            }
-                                                        }}
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))
-                                            ) : null}
-                                        </div>
 
                                         <div className="task-status">
                                             <select
