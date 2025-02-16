@@ -79,7 +79,7 @@ const Login = () => {
                 </form>
                 <p className="register-link">
                     Don't have an account?  
-                    <a href='http://localhost:3000/register'>Register!</a>
+                    <a href='/register'>Register!</a>
                 </p>
             </div>
         </div>
