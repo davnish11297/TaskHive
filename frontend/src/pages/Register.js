@@ -8,6 +8,10 @@ const API_URL = if_live
     ? "https://taskhive-d0c8.onrender.com" 
     : "http://localhost:5001";
 
+const FRONT_END_URL = if_live 
+  ? "https://taskhive-frontend-6uz2diami-davnish11297s-projects.vercel.app" 
+  : "http://localhost:5001";
+
 const Register = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -103,7 +107,7 @@ const Register = () => {
                 </form>
                 <p className="register-link">
                     Already have an account?  
-                    <a href='http://localhost:3000/login'>Login!</a>
+                    <a href={`${FRONT_END_URL}/login`}>Login!</a>
                 </p>
             </div>
         </div>

@@ -63,7 +63,7 @@ const Home = () => {
             console.error('Error fetching tasks:', error);
             setLoading(false);
         }
-    }, [userToken, categoryFilter, tagFilter]);
+    }, [userToken, categoryFilter, tagFilter, API_URL]);
 
     useEffect(() => {
         fetchTasks();
@@ -171,7 +171,7 @@ const Home = () => {
     const token = localStorage.getItem('token');
     const handleBid = async (taskId, bidAmount, estimatedCompletion, message) => {
         try {
-            const response = await axios.post(
+            await axios.post(
                 `${API_URL}/api/tasks/${taskId}/bid`,
                 { bidAmount, estimatedCompletion, message },
                 { headers: { 
