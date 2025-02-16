@@ -29,6 +29,8 @@ const Home = () => {
     const [categoryFilter, setCategoryFilter] = useState('');
     const [tagFilter, setTagFilter] = useState('');
     const [user, setUser] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState(""); // Track selected category
+    const [selectedTags, setSelectedTags] = useState([]);
 
     const if_live = true;
     const API_URL = if_live 
@@ -43,6 +45,14 @@ const Home = () => {
             setUser(decodedToken.name)
         }
     }, [userToken]);
+
+    const handleCategoryClick = (category) => {
+        setCategoryFilter(category); // ✅ This updates the input field
+    };
+
+    const handleRemoveTag = (tagToRemove) => {
+        setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+    };
 
     const fetchTasks = useCallback(async () => {
         try {
@@ -280,15 +290,28 @@ const Home = () => {
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
-            // Filter logic runs after 300ms delay
-            setFilteredTasks(tasks.filter(task => 
-                task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                task.description.toLowerCase().includes(searchQuery.toLowerCase())
-            ));
-        }, 300);  // Delay in milliseconds
+            setFilteredTasks(
+                tasks.filter(task => {
+                    // Convert search query to lowercase
+                    const query = searchQuery.toLowerCase();
+                    
+                    // Search filter (title or description must match searchQuery)
+                    const matchesSearch = 
+                        task.title.toLowerCase().includes(query) ||
+                        task.description.toLowerCase().includes(query);
+    
+                    // Tags filter (if selectedTags is not empty, task must contain at least one of the selected tags)
+                    const matchesTags = 
+                        selectedTags.length === 0 || 
+                        selectedTags.some(tag => task.tags.includes(tag));
+    
+                    return matchesSearch && matchesTags;
+                })
+            );
+        }, 300);  // Delay for better performance
     
         return () => clearTimeout(delayDebounce);
-    }, [searchQuery, tasks]);
+    }, [searchQuery, tasks, selectedTags]);
 
     return (
         <div className="home-container">
@@ -376,19 +399,29 @@ const Home = () => {
                         placeholder="Filter by Category"
                         className='category-filter'
                     />
-                    <input
-                        type="text"
-                        value={tagFilter}
-                        onChange={handleTagFilterChange}
-                        placeholder="Filter by Tags"
-                        className='tag-filter'
-                    />
 
                     <button className="logout-btn" onClick={handleLogout}>
                         Logout
                     </button>
                 </nav>
             </div>
+
+            {console.log("Selected Tags:", selectedTags)}
+
+            {selectedTags.length > 0 && (  // 👈 Only render if there are selected tags
+                <div className="selected-tags-container">
+                    {selectedTags.map((tag, index) => (
+                        <span key={index} className="selected-tag">
+                            {tag} 
+                            <button className="remove-tag" onClick={() => 
+                                setSelectedTags(prevTags => prevTags.filter(t => t !== tag))
+                            }>
+                                ✖
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            )}
 
             {/* Right Side: Task Listings */}
             <div className="task-list-container">
@@ -405,6 +438,27 @@ const Home = () => {
                             <div className="task-row">
                                 {taskStatusGroups.PENDING.map((task) => (
                                     <div key={task._id} className="task-item" onClick={() => handleTaskClick(task)}>
+
+                                        {/* Tags */}
+                                        <div className="task-tags">
+                                            {task.tags && task.tags.length > 0 ? (
+                                                task.tags.map((tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="task-tag clickable"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent opening the bidding modal
+                                                            if (!selectedTags.includes(tag)) {
+                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
+                                                            }
+                                                        }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))
+                                            ) : null}
+                                        </div>
+
                                         <div className="task-item-header">{task.title}</div>
                                         <div className="task-item-content">
                                             <p>{task.description}</p>
@@ -414,6 +468,18 @@ const Home = () => {
                                             <p>
                                                 <strong>Deadline:</strong> {formatDate(task.deadline)}
                                             </p>
+
+                                            {/* Category */}
+                                            {task.category && (
+                                                <p className="task-category" 
+                                                onClick={(e) => {  
+                                                    e.stopPropagation();  // Prevents the click from triggering parent events  
+                                                    setCategoryFilter(task.category);  // Updates the category filter  
+                                                }}>
+                                                    {task.category}
+                                                </p>
+                                            )}
+
                                             {userRole === 'freelancer' ? (
                                                 <>
                                                     {/* Bidding Section */}
@@ -473,6 +539,27 @@ const Home = () => {
                             <div className="task-row">
                                 {taskStatusGroups.IN_PROGRESS.map((task) => (
                                     <div key={task._id} className="task-item" onClick={() => handleTaskClick(task)}>
+
+                                        {/* Tags */}
+                                        <div className="task-tags">
+                                            {task.tags && task.tags.length > 0 ? (
+                                                task.tags.map((tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="task-tag clickable"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent opening the bidding modal
+                                                            if (!selectedTags.includes(tag)) {
+                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
+                                                            }
+                                                        }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))
+                                            ) : null}
+                                        </div>
+
                                         <div className="task-item-header">{task.title}</div>
                                         <div className="task-item-content">
                                             <p>{task.description}</p>
@@ -483,6 +570,38 @@ const Home = () => {
                                                 <strong>Deadline:</strong> {formatDate(task.deadline)}
                                             </p>
                                         </div>
+
+                                        {/* Category */}
+                                        {task.category && (
+                                            <p className="task-category" 
+                                            onClick={(e) => {  
+                                                e.stopPropagation();  // Prevents the click from triggering parent events  
+                                                setCategoryFilter(task.category);  // Updates the category filter  
+                                            }}>
+                                                {task.category}
+                                            </p>
+                                        )}
+
+                                        {/* Tags */}
+                                        <div className="task-tags">
+                                            {task.tags && task.tags.length > 0 ? (
+                                                task.tags.map((tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="task-tag"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent opening the bidding modal
+                                                            if (!selectedTags.includes(tag)) {
+                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
+                                                            }
+                                                        }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))
+                                            ) : null}
+                                        </div>
+
                                         <div className="task-status">
                                             <select
                                                 className="status-dropdown"
@@ -507,6 +626,27 @@ const Home = () => {
                             <div className="task-row">
                                 {taskStatusGroups.COMPLETED.map((task) => (
                                     <div key={task._id} className="task-item" onClick={() => handleTaskClick(task)}>
+
+                                        {/* Tags */}
+                                        <div className="task-tags">
+                                            {task.tags && task.tags.length > 0 ? (
+                                                task.tags.map((tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="task-tag clickable"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent opening the bidding modal
+                                                            if (!selectedTags.includes(tag)) {
+                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
+                                                            }
+                                                        }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))
+                                            ) : null}
+                                        </div>
+
                                         <div className="task-item-header">{task.title}</div>
                                         <div className="task-item-content">
                                             <p>{task.description}</p>
@@ -517,6 +657,38 @@ const Home = () => {
                                                 <strong>Deadline:</strong> {formatDate(task.deadline)}
                                             </p>
                                         </div>
+
+                                        {/* Category */}
+                                        {task.category && (
+                                            <p className="task-category" 
+                                            onClick={(e) => {  
+                                                e.stopPropagation();  // Prevents the click from triggering parent events  
+                                                setCategoryFilter(task.category);  // Updates the category filter  
+                                            }}>
+                                                {task.category}
+                                            </p>
+                                        )}
+
+                                        {/* Tags */}
+                                        <div className="task-tags">
+                                            {task.tags && task.tags.length > 0 ? (
+                                                task.tags.map((tag, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="task-tag"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent opening the bidding modal
+                                                            if (!selectedTags.includes(tag)) {
+                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
+                                                            }
+                                                        }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))
+                                            ) : null}
+                                        </div>
+
                                         <div className="task-status">
                                             <select
                                                 className="status-dropdown"

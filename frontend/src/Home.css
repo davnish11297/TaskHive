@@ -392,7 +392,7 @@ p {
   margin-left: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width:300px;
+  width:250px;
 }
 
 .search-bar:focus {
@@ -406,7 +406,7 @@ p {
   margin-left: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width:110px;
+  width:175px;
 }
 
 .category-filter:focus {
@@ -557,4 +557,143 @@ p {
 .category-dropdown:focus {
   outline: none;
   border-color: #007bff;
+}
+
+/* 🎨 Category Styling */
+.task-category {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.task-category:hover {
+  background-color: #7a9ec5;
+}
+
+/* 🏷️ Tags Styling */
+.task-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.task-tag {
+  background-color: #28a745;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ⚠️ No Tags */
+.task-tag.no-tags {
+  background-color: #ccc;
+  color: #555;
+}
+
+.task-tag {
+  display: inline-block;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.3s;
+}
+
+.task-tag:hover {
+  background-color: #ddd;
+}
+
+.selected-tags {
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.selected-tag {
+  display: flex;
+  align-items: center;
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  margin: 3px;
+  font-size: 14px;
+}
+
+.remove-tag-btn {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 15px;
+}
+
+.task-tag.clickable {
+  cursor: pointer;
+  color: blue;
+}
+
+.selected-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  margin-left: 340px;
+  margin-top: 20px;
+}
+
+.selected-tag {
+  background-color: #bdd8e7;
+  color: blue;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.remove-tag-btn {
+  border-radius: 15px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.task-tags {
+  margin-bottom: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.task-tag {
+  background-color: #eef2ff;
+  color: #3b82f6;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.task-tag.clickable {
+  cursor: pointer;
+}
+
+.clickable-category {
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
 }
