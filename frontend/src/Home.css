@@ -228,7 +228,7 @@ p {
   border-radius: 4px;
   font-size: 14px;
   transition: background-color 0.3s ease;
-  margin-left: 200px;
+  margin-left: 80px;
 }
 
 .logout-btn:hover {
@@ -696,4 +696,25 @@ p {
   cursor: pointer;
   color: blue;
   text-decoration: underline;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: 50px;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center; /* Horizontally center */
+  align-items: center; /* Vertically center (if needed) */
+  height: 10vh; /* Make the container take full viewport height */
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
 }

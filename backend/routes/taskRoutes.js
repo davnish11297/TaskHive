@@ -61,4 +61,43 @@ router.patch('/tasks/:id/status', async (req, res) => {
     }
 });
 
+// Delete a task
+router.delete("/tasks/:id", async (req, res) => {
+    try {
+        const taskId = req.params.id;
+        const userId = req.user;  // Assuming user is added to request after authentication
+
+        // Find the task and ensure it belongs to the logged-in user
+        const task = await Task.findOne({ _id: taskId, userId });
+
+        if (!task) {
+            return res.status(404).json({ message: "Task not found or you don't have permission to delete this task" });
+        }
+
+        // Delete the task
+        await Task.deleteOne({ _id: taskId });
+
+        res.status(200).json({ message: "Task deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting task:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+router.put("/tasks/:taskId", async (req, res) => {
+    try {
+        const { title, description, deadline, budget } = req.body;
+        const updatedTask = await Task.findByIdAndUpdate(
+            req.params.taskId,
+            { title, description, deadline, budget },
+            { new: true }
+        );
+
+        if (!updatedTask) return res.status(404).json({ message: "Task not found" });
+        res.json(updatedTask);
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
 module.exports = router;

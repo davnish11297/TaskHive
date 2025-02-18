@@ -55,6 +55,9 @@ const User = require('./models/User')
 const bidRoutes = require('./routes/bidRoutes');
 app.use('/api', bidRoutes);
 
+const userRoutes = require('./routes/userRoutes')
+app.use('/user', userRoutes);
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

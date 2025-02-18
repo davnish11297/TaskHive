@@ -49,7 +49,10 @@ const Login = ({ setIsAuthenticated }) => {
     return (
         <div className="login-container">
             <div className="login-form">
-                <h2>Login to TaskHive 🐝</h2>
+            <div className="logo-container">
+                <img className="logo" src="/taskhive-logo.png" alt="TaskHive Logo" />
+            </div>
+                {/* <h2>Login to TaskHive 🐝</h2> */}
                 {error && <p className="error-message">{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">

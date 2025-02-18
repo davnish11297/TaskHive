@@ -313,12 +313,31 @@ const Home = () => {
         return () => clearTimeout(delayDebounce);
     }, [searchQuery, tasks, selectedTags]);
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://localhost:5001/api/profile", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setUser(response.data);
+            } catch (error) {
+                console.error("Error fetching user:", error);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
     return (
         <div className="home-container">
             {/* Left Side: Form */}
             <div className="task-form-container">
+                <div className="logo-container">
+                    <img className="logo" src="/taskhive-logo.png" alt="TaskHive Logo" />
+                </div>
                 <center>
-                    <h1>TaskHive 🐝</h1>
+                    {/* <h1>TaskHive 🐝</h1> */}
                     <h2>Create Task</h2>
                 </center>
                 <form onSubmit={handleCreateTask} className="task-form">
@@ -400,13 +419,22 @@ const Home = () => {
                         className='category-filter'
                     />
 
+                    {/* Profile Icon */}
+                    <div className="profile-container" onClick={() => navigate("/profile")}>
+                        <img
+                            src={user?.profilePicture || "/default-avatar.png"} 
+                            alt="Profile"
+                            className="profile-icon"
+                        />
+                    </div>
+
                     <button className="logout-btn" onClick={handleLogout}>
                         Logout
                     </button>
                 </nav>
             </div>
 
-            {console.log("Selected Tags:", selectedTags)}
+            {/* {console.log("Selected Tags:", selectedTags)} */}
 
             {selectedTags.length > 0 && (  // 👈 Only render if there are selected tags
                 <div className="selected-tags-container">
