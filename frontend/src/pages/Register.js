@@ -47,7 +47,7 @@ const Register = () => {
         <div className="register-container">
             <div className="register-form">
                 <div className="logo-container">
-                    <img className="logo" src="/taskhive-logo.png" alt="TaskHive Logo" />
+                    <img className="logo" src={`${window.location.origin}/taskhive-logo.png`} alt="TaskHive Logo" />
                 </div>
                 {/* <h2>Register to TaskHive 🐝</h2> */}
                 {error && <p className="error-message">{error}</p>}
