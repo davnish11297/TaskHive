@@ -334,7 +334,7 @@ const Home = () => {
             {/* Left Side: Form */}
             <div className="task-form-container">
                 <div className="logo-container">
-                    <img className="logo" src="/taskhive-logo.png" alt="TaskHive Logo" />
+                    <img className="logo" src={`${window.location.origin}/taskhive-logo.png`} alt="TaskHive Logo" />
                 </div>
                 <center>
                     {/* <h1>TaskHive 🐝</h1> */}

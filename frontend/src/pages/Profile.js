@@ -11,7 +11,7 @@ const Profile = () => {
     const [editingTask, setEditingTask] = useState(null);
     const [editedTask, setEditedTask] = useState({ title: "", description: "", budget: "", deadline: "" });
 
-    const if_live = false;
+    const if_live = true;
     const API_URL = if_live 
         ? "https://taskhive-d0c8.onrender.com" 
         : "http://localhost:5001";

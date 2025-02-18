@@ -50,7 +50,7 @@ const Login = ({ setIsAuthenticated }) => {
         <div className="login-container">
             <div className="login-form">
             <div className="logo-container">
-                <img className="logo" src="/taskhive-logo.png" alt="TaskHive Logo" />
+                <img className="logo" src={`${window.location.origin}/taskhive-logo.png`} alt="TaskHive Logo" />
             </div>
                 {/* <h2>Login to TaskHive 🐝</h2> */}
                 {error && <p className="error-message">{error}</p>}
