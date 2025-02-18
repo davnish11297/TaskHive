@@ -46,7 +46,10 @@ const Register = () => {
     return (
         <div className="register-container">
             <div className="register-form">
-                <h2>Register to TaskHive 🐝</h2>
+                <div className="logo-container">
+                    <img className="logo" src="/taskhive-logo.png" alt="TaskHive Logo" />
+                </div>
+                {/* <h2>Register to TaskHive 🐝</h2> */}
                 {error && <p className="error-message">{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
