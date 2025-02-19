@@ -1,6 +1,6 @@
 const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
-const Task = require('../models/Task');
+const sendEmail = require("../utils/sendEmail");
 
 const router = express.Router();
 
@@ -17,6 +17,38 @@ router.post('/tasks', async (req, res) => {
 
       const newTask = new Task({ title, description, budget, deadline, status, category, tags, user: userId });
       await newTask.save();
+
+      try {
+
+        // Fetch all users with the role of "freelancer"
+        const freelancers = await User.find({ role: "freelancer" });
+
+        console.log("Freelancers found:", freelancers);
+      } catch(err) {
+        console.error("Error fetching freelancers:", err);
+      }
+
+      const notifications = freelancers.map((freelancer) => ({
+        user: freelancer._id,
+        message: `New task posted: ${newTask.title}`,
+      }));
+
+      console.log("Notifications to be inserted:", notifications);
+
+      // Store notifications in DB
+      await Notification.insertMany(notifications);
+
+      // Emit notifications via WebSocket
+      freelancers.forEach((freelancer) => {
+        io.to(freelancer._id.toString()).emit("notification", `New task posted: ${newTask.title}`);
+      });
+
+      // Send email to freelancers
+      freelancers.forEach((freelancer) => {
+        sendEmail(freelancer.email, "New Task Available!", `A new task "${newTask.title}" has been posted.`);
+      });
+
+      sendEmail(freelancer.email, "New Task Available!", `A new task "${newTask.title}" has been posted.`);
       res.status(201).json(newTask);
     } catch (error) {
       console.error('Error creating task:', error);
