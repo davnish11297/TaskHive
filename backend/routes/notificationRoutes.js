@@ -6,13 +6,11 @@ const { authenticateToken } = require("../middleware/authMiddleware");
 // Get notifications for the logged-in user
 router.get('/notifications', authenticateToken, async (req, res) => {
     try {
-        console.log("User in request:", req.user); // ✅ Debugging
-
         if (!req.user || !req.user.id) {
             return res.status(400).json({ error: "User ID not found in request" });
         }
 
-        const notifications = await Notification.find({ user: req.user.id });
+        const notifications = await Notification.find({ user: req.user.id, isRead: false });
         res.json(notifications);
     } catch (error) {
         console.error("Error fetching notifications:", error);

@@ -156,6 +156,20 @@ const Profile = () => {
         navigate(-1); // Go back to the previous page
     };
 
+    const removeNotification = (index) => {
+        setNotifications(notifications.filter((_, i) => i !== index));
+    };
+
+    const markAsRead = async (id) => {
+        try {
+          const res = await axios.put(`${API_URL}/api/notifications/${id}/read`);
+          console.log(res)
+          setNotifications(notifications.filter(notification => notification._id !== id));
+        } catch (error) {
+          console.error("Error marking notification as read:", error);
+        }
+    };
+
     if (!user) return <p>Loading profile...</p>;
 
     return (
@@ -164,13 +178,18 @@ const Profile = () => {
             {/* Back Button */}
             <button onClick={goBack} className="back-button">← Back</button>
 
-            <div className="notifications">
-                <h3>Notifications</h3>
-                {notifications.map((n) => (
-                    <div key={n._id} className={`notification ${n.isRead ? "read" : "unread"}`}>
-                        {n.message}
-                    </div>
-                ))}
+            <h2 className="section-title">📢 Notifications</h2>
+            <div className="notifications-container">
+                {notifications.length > 0 ? (
+                    notifications.map((notification, index) => (
+                        <div key={index} className="notification-card">
+                            <p>🔔 {notification.message}</p>
+                            <button className="close-btn" onClick={() => markAsRead(notification._id)}>✖</button>
+                        </div>
+                    ))
+                ) : (
+                    <p className="no-notifications">No new notifications</p>
+                )}
             </div>
 
             {/* Profile Section */}

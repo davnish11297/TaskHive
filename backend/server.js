@@ -29,13 +29,19 @@ console.log("Current environment:", process.env.NODE_ENV);
 
 const io = new Server(server, {
   cors: {
-      origin: "http://localhost:3000",
+      origin: "*",
       methods: ["GET", "POST"]
   },
 });
 
 app.use(cors());
 app.use(express.json());
+
+// Pass `io` to routes
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
 app.get("/", (req, res) => {
   res.send("API is running...");
