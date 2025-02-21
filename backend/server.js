@@ -25,6 +25,8 @@ const cors = require('cors');
 //   credentials: true
 // }));
 
+console.log("Current environment:", process.env.NODE_ENV);
+
 const io = new Server(server, {
   cors: {
       origin: "http://localhost:3000",
