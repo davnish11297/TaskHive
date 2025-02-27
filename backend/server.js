@@ -43,6 +43,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.set("io", io);
+
 app.get("/", (req, res) => {
   res.send("API is running...");
 });

@@ -6,6 +6,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 
 const router = express.Router();
+const moment = require("moment");
 
 // Create a new task
 router.post('/tasks', async (req, res) => {
@@ -37,6 +38,7 @@ router.post('/tasks', async (req, res) => {
         const notifications = freelancers.map((freelancer) => ({
           user: freelancer._id,
           message: `New task posted: ${newTask.title}`,
+          createdAt: new Date(),
         }));
 
         console.log("Notifications to be inserted:", notifications);
@@ -46,7 +48,10 @@ router.post('/tasks', async (req, res) => {
 
         // Emit notifications via WebSocket
         freelancers.forEach((freelancer) => {
-          req.io.to(freelancer._id.toString()).emit("notification", `New task posted: ${newTask.title}`);
+          req.io.to(freelancer._id.toString()).emit("notification", {
+            message: `New task posted: ${newTask.title}`,
+            createdAt: new Date(),
+          });
         });
 
         // Send email to freelancers

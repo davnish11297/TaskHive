@@ -5,6 +5,7 @@ import "../../src/Profile.css"; // Add this CSS file if you haven't already
 import { FaEdit, FaTrash, FaArrowLeft } from "react-icons/fa";
 import io from "socket.io-client";
 import socket from "../socket";
+import moment from "moment";
 
 const Profile = () => {
     const [tasks, setTasks] = useState([]);
@@ -18,6 +19,9 @@ const Profile = () => {
     const API_URL = if_live 
         ? "https://taskhive-d0c8.onrender.com" 
         : "http://localhost:5001";
+
+    const socket = io("http://localhost:5002"); // Connect to backend WebSocket
+
 
     function formatDate(isoString) {
         const date = new Date(isoString);
@@ -140,6 +144,15 @@ const Profile = () => {
         };
     
         fetchNotifications();
+
+        // Listen for real-time notifications
+        socket.on("notification", (newNotification) => {
+            setNotifications((prev) => [...prev, newNotification]);
+        });
+
+        return () => {
+            socket.off("notification"); // Cleanup
+        };
     }, []);
 
     useEffect(() => {
@@ -183,7 +196,9 @@ const Profile = () => {
                 {notifications.length > 0 ? (
                     notifications.map((notification, index) => (
                         <div key={index} className="notification-card">
-                            <p>🔔 {notification.message}</p>
+                            <p>🔔 {notification.message} <br />
+                                <small className="time-ago">{moment(notification.createdAt).fromNow()}</small>
+                            </p>
                             <button className="close-btn" onClick={() => markAsRead(notification._id)}>✖</button>
                         </div>
                     ))
