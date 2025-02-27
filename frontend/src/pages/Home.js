@@ -32,7 +32,7 @@ const Home = () => {
     const [selectedCategory, setSelectedCategory] = useState(""); // Track selected category
     const [selectedTags, setSelectedTags] = useState([]);
 
-    const if_live = true;
+    const if_live = false;
     const API_URL = if_live 
         ? "https://taskhive-d0c8.onrender.com" 
         : "http://localhost:5001";
@@ -59,6 +59,8 @@ const Home = () => {
             const query = [];
             if (categoryFilter) query.push(`category=${categoryFilter}`);
             if (tagFilter) query.push(`tag=${tagFilter}`);
+
+            console.log(`${API_URL}/api/tasks?${query.join('&')}`)
 
             const response = await axios.get(`${API_URL}/api/tasks?${query.join('&')}`, {
                 headers: { Authorization: `Bearer ${userToken}` },
@@ -317,7 +319,7 @@ const Home = () => {
         const fetchUser = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get("http://localhost:5001/api/profile", {
+                const response = await axios.get(`${API_URL}/user/profile`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setUser(response.data);

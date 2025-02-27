@@ -3,6 +3,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../../src/Profile.css"; // Add this CSS file if you haven't already
 import { FaEdit, FaTrash, FaArrowLeft } from "react-icons/fa";
+import io from "socket.io-client";
+import socket from "../socket";
+import moment from "moment";
 
 const Profile = () => {
     const [tasks, setTasks] = useState([]);
@@ -10,11 +13,15 @@ const Profile = () => {
     const navigate = useNavigate();
     const [editingTask, setEditingTask] = useState(null);
     const [editedTask, setEditedTask] = useState({ title: "", description: "", budget: "", deadline: "" });
+    const [notifications, setNotifications] = useState([]);
 
-    const if_live = true;
+    const if_live = false;
     const API_URL = if_live 
         ? "https://taskhive-d0c8.onrender.com" 
         : "http://localhost:5001";
+
+    const socket = io("http://localhost:5002"); // Connect to backend WebSocket
+
 
     function formatDate(isoString) {
         const date = new Date(isoString);
@@ -34,6 +41,7 @@ const Profile = () => {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem("token");
+                console.log(token);
                 if (!token) return;
         
                 const response = await axios.get(`${API_URL}/user/profile`, {
@@ -48,6 +56,20 @@ const Profile = () => {
 
         fetchProfile();
     }, [API_URL, tasks]);
+
+    useEffect(() => {
+        if (!user) return;
+    
+        socket.emit("join", user._id);
+    
+        socket.on("notification", (message) => {
+            setNotifications((prev) => [...prev, { message, isRead: false }]);
+        });
+    
+        return () => {
+            socket.off("notification"); // Clean up event listener
+        };
+    }, [user]);
 
     const handleDeleteTask = async (taskId) => {
         try {
@@ -108,8 +130,57 @@ const Profile = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(`${API_URL}/api/notifications`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setNotifications(response.data);
+            } catch (error) {
+                console.log('Error fetching notifications:', error);
+            }
+        };
+    
+        fetchNotifications();
+
+        // Listen for real-time notifications
+        socket.on("notification", (newNotification) => {
+            setNotifications((prev) => [...prev, newNotification]);
+        });
+
+        return () => {
+            socket.off("notification"); // Cleanup
+        };
+    }, []);
+
+    useEffect(() => {
+        socket.on("connect", () => {
+            console.log("Connected to WebSocket");
+        });
+    
+        return () => {
+            socket.off("connect"); // Remove listener instead of disconnecting socket
+        };
+    }, []);
+
     const goBack = () => {
         navigate(-1); // Go back to the previous page
+    };
+
+    const removeNotification = (index) => {
+        setNotifications(notifications.filter((_, i) => i !== index));
+    };
+
+    const markAsRead = async (id) => {
+        try {
+          const res = await axios.put(`${API_URL}/api/notifications/${id}/read`);
+          console.log(res)
+          setNotifications(notifications.filter(notification => notification._id !== id));
+        } catch (error) {
+          console.error("Error marking notification as read:", error);
+        }
     };
 
     if (!user) return <p>Loading profile...</p>;
@@ -119,6 +190,22 @@ const Profile = () => {
 
             {/* Back Button */}
             <button onClick={goBack} className="back-button">← Back</button>
+
+            <h2 className="section-title">📢 Notifications</h2>
+            <div className="notifications-container">
+                {notifications.length > 0 ? (
+                    notifications.map((notification, index) => (
+                        <div key={index} className="notification-card">
+                            <p>🔔 {notification.message} <br />
+                                <small className="time-ago">{moment(notification.createdAt).fromNow()}</small>
+                            </p>
+                            <button className="close-btn" onClick={() => markAsRead(notification._id)}>✖</button>
+                        </div>
+                    ))
+                ) : (
+                    <p className="no-notifications">No new notifications</p>
+                )}
+            </div>
 
             {/* Profile Section */}
             <div className="profile-section">

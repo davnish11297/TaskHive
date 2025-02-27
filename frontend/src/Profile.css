@@ -151,3 +151,49 @@
     cursor: pointer;
     margin-left: 10px;
 }
+
+.section-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.notifications-container {
+    /* background: #f9f9f9; */
+    padding: 15px;
+    border-radius: 8px;
+    /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+}
+
+.notification-card {
+    background: white;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border-left: 5px solid #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ensures the button stays on the right */
+    font-size: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.notification-card p {
+    margin: 0;
+    color: #333;
+}
+
+.no-notifications {
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #ff0000;
+    font-size: 16px;
+    cursor: pointer;
+}

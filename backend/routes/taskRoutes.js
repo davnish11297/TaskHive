@@ -1,8 +1,12 @@
 const express = require('express');
 const authMiddleware = require('../middleware/authMiddleware');
-const Task = require('../models/Task');
+const sendEmail = require("../utils/sendEmail");
+const Task = require('../models/Task'); 
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 const router = express.Router();
+const moment = require("moment");
 
 // Create a new task
 router.post('/tasks', async (req, res) => {
@@ -17,12 +21,51 @@ router.post('/tasks', async (req, res) => {
 
       const newTask = new Task({ title, description, budget, deadline, status, category, tags, user: userId });
       await newTask.save();
+
+      // Declare freelancers variable outside so it's accessible
+      let freelancers = [];
+
+      try {
+        // Fetch all users with the role of "freelancer"
+        freelancers = await User.find({ role: "freelancer" });
+        console.log("Freelancers found:", freelancers);
+      } catch(err) {
+        console.error("Error fetching freelancers:", err);
+      }
+
+      // Ensure freelancers exist before proceeding
+      if (freelancers.length > 0) {
+        const notifications = freelancers.map((freelancer) => ({
+          user: freelancer._id,
+          message: `New task posted: ${newTask.title}`,
+          createdAt: new Date(),
+        }));
+
+        console.log("Notifications to be inserted:", notifications);
+
+        // Store notifications in DB
+        await Notification.insertMany(notifications);
+
+        // Emit notifications via WebSocket
+        freelancers.forEach((freelancer) => {
+          req.io.to(freelancer._id.toString()).emit("notification", {
+            message: `New task posted: ${newTask.title}`,
+            createdAt: new Date(),
+          });
+        });
+
+        // Send email to freelancers
+        freelancers.forEach((freelancer) => {
+          sendEmail(freelancer.email, "New Task Available!", `A new task "${newTask.title}" has been posted.`);
+        });
+      }
+
       res.status(201).json(newTask);
     } catch (error) {
       console.error('Error creating task:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
+});
 
 // Get All Tasks
 router.get('/tasks', async (req, res) => {
@@ -38,7 +81,8 @@ router.get('/tasks', async (req, res) => {
 
         res.status(200).json({ tasks });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching tasks' });
+        console.error("Error fetching tasks:", error); // Log the full error
+        res.status(500).json({ message: 'Error fetching tasks', error: error.message });
     }
 });
 

@@ -10,8 +10,6 @@ router.get("/profile", async (req, res) => {
         const { email, postedBy } = req.body;  // Assuming the authMiddleware attaches the user info
         const user = await User.findOne(email).populate("tasks");  // Populate tasks if there's a reference in User model
 
-        console.log(req)
-
         if (!user) return res.status(404).json({ message: "User not found" });
 
         // Fetch tasks related to the user, assuming the tasks have a reference to the user
