@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaStar, FaMapMarkerAlt, FaDollarSign, FaClock, FaUserCheck, FaFilter, FaSort } from 'react-icons/fa';
+import { FaStar, FaMapMarkerAlt, FaDollarSign, FaClock, FaUserCheck, FaFilter } from 'react-icons/fa';
 import '../Home.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
@@ -27,7 +27,7 @@ function TaskFeed() {
         }
 
         fetchTasks();
-    }, [currentPage, filters]);
+    }, [currentPage, filters, navigate]);
 
     const fetchTasks = async () => {
         try {
