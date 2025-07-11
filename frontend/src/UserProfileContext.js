@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:5001';
+import { API_URL } from './config/api';
 
 const UserProfileContext = createContext();
 

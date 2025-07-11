@@ -3,15 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../../src/Login.css';
 import { useUserProfile } from '../UserProfileContext';
-
-const if_live = false;
-const API_URL = if_live 
-    ? "https://taskhive-d0c8.onrender.com" 
-    : "http://localhost:5001";
-
-const FRONT_END_URL = if_live 
-? "https://taskhive-frontend-6uz2diami-davnish11297s-projects.vercel.app" 
-: "http://localhost:5001";
+import { API_URL, FRONTEND_URL } from '../config/api';
 
 const Login = ({ setIsAuthenticated }) => {
     const [formData, setFormData] = useState({
@@ -90,7 +82,7 @@ const Login = ({ setIsAuthenticated }) => {
                 </form>
                 <p className="register-link">
                     Don't have an account?  
-                    <a href={`${FRONT_END_URL}/register`}>Register!</a>
+                    <a href={`${FRONTEND_URL}/register`}>Register!</a>
                 </p>
             </div>
         </div>

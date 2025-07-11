@@ -4,6 +4,8 @@ import { jwtDecode } from 'jwt-decode';
 import '../../src/Home.css';
 import { useNavigate } from 'react-router-dom';
 import { FaPlusCircle, FaSearch, FaGift, FaChartLine, FaClock, FaStar, FaUserCircle } from 'react-icons/fa';
+import { useUserProfile } from '../UserProfileContext';
+import { API_URL } from '../config/api';
 
 const Home = () => {
     const [tasks, setTasks] = useState([]);
@@ -14,8 +16,6 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [bidsLoading, setBidsLoading] = useState(true);
     const navigate = useNavigate();
-
-    const API_URL = "http://localhost:5001";
 
     useEffect(() => {
         if (userToken) {
