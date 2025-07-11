@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaStar, FaMapMarkerAlt, FaDollarSign, FaClock, FaUserCheck, FaLightbulb, FaRocket, FaUsers, FaChartLine, FaFilter } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaDollarSign, FaClock, FaUserCheck, FaLightbulb, FaRocket, FaUsers, FaChartLine, FaFilter } from 'react-icons/fa';
 import '../Home.css';
 import '../Recommendations.css';
 
@@ -12,7 +12,7 @@ function Recommendations() {
     const [freelancerRecommendations, setFreelancerRecommendations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [userRole, setUserRole] = useState('');
-    const [selectedTask, setSelectedTask] = useState(null);
+
     const [showFreelancerModal, setShowFreelancerModal] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -33,7 +33,7 @@ function Recommendations() {
         }
 
         fetchRecommendations();
-    }, [navigate]);
+    }, [navigate, userRole]);
 
     // Check if there's a taskId in the URL for freelancer recommendations
     useEffect(() => {
@@ -88,12 +88,7 @@ function Recommendations() {
         return `$${budget.toLocaleString()}`;
     };
 
-    const getSkillMatchCount = (task, userSkills) => {
-        if (!userSkills || userSkills.length === 0) return 0;
-        
-        const taskText = `${task.title} ${task.description} ${task.category} ${(task.tags || []).join(' ')}`.toLowerCase();
-        return userSkills.filter(skill => taskText.includes(skill)).length;
-    };
+
 
     if (loading) {
         return (
