@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../../src/Login.css';
+import { useUserProfile } from '../UserProfileContext';
 
-const if_live = true;
+const if_live = false;
 const API_URL = if_live 
     ? "https://taskhive-d0c8.onrender.com" 
     : "http://localhost:5001";
@@ -20,6 +21,7 @@ const Login = ({ setIsAuthenticated }) => {
 
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const { login } = useUserProfile();
 
     const handleChange = (e) => {
         setFormData({
@@ -39,6 +41,7 @@ const Login = ({ setIsAuthenticated }) => {
             const { token } = response.data;
             localStorage.setItem('token', token);
             setIsAuthenticated(true);
+            login(); // Trigger profile fetch
             navigate('/home');
         } catch (error) {
             console.error("Login error", error);

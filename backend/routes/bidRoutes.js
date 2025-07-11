@@ -107,4 +107,17 @@ router.patch('/tasks/reject/:bidId', authenticateToken, async (req, res) => {
     }
 });
 
+// Get all bids made by the current user
+router.get('/bids/my', authenticateToken, async (req, res) => {
+    try {
+        const bids = await Bid.find({ bidder: req.user.id })
+            .populate('task')
+            .sort({ createdAt: -1 });
+        res.json(bids);
+    } catch (error) {
+        console.error('Error fetching user bids:', error);
+        res.status(500).json({ error: 'Failed to fetch user bids' });
+    }
+});
+
 module.exports = router;

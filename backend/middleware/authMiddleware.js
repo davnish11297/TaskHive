@@ -17,12 +17,14 @@ const authenticateToken = (req, res, next) => {
 
         console.log("✅ Decoded token:", decoded);
 
-        if (!decoded.id) {
+        // Accept both 'id' and 'userId'
+        const userId = decoded.id || decoded.userId;
+        if (!userId) {
             console.error("❌ Token does not contain user ID");
             return res.status(403).json({ error: "Token does not contain valid user ID" });
         }
 
-        req.user = decoded;
+        req.user = { ...decoded, id: userId }; // Always set req.user.id
         next();
     });
 };

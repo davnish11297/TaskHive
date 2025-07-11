@@ -31,8 +31,7 @@ router.post('/register', async (req, res) => {
       await user.save();
   
       // Generate JWT token
-    //   const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
-      const token = jwt.sign({ userId: user._id }, 'yourSuperSecretKey', { expiresIn: '1h' });
+      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
   
       console.log('User registered successfully:', user); // Debug log
   
@@ -53,29 +52,42 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const user = await User.findOne({ email });
+    try {
+        const user = await User.findOne({ email });
 
-    if (!user) {
-      console.log("User not found for email:", email);
-      return res.status(400).json({ message: 'Invalid credentials' });
+        if (!user) {
+          console.log("User not found for email:", email);
+          return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        console.log("User found:", { 
+            id: user._id, 
+            name: user.name, 
+            email: user.email, 
+            role: user.role,
+            hasPassword: !!user.password 
+        });
+
+        if (!user.password) {
+            console.log("User password is missing!");
+            return res.status(500).json({ message: 'Server error: password missing' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log("Password match result:", isMatch);
+
+        if (!isMatch) {
+            console.log("Password does not match");
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
+        console.log("Login successful for:", user.email);
+        res.json({ token, user });
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({ message: 'Server error during login' });
     }
-
-    console.log("User found:", user);
-
-    if (!user.password) {
-        console.log("User password is missing!");
-        return res.status(500).json({ message: 'Server error: password missing' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-        console.log("Password does not match");
-        return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
-    res.json({ token, user });
 });
 
 module.exports = router;
