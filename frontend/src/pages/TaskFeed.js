@@ -27,7 +27,7 @@ function TaskFeed() {
         }
 
         fetchTasks();
-    }, [currentPage, filters, navigate]);
+    }, [currentPage, filters, navigate, fetchTasks]);
 
     const fetchTasks = async () => {
         try {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaBrain, FaClock, FaChartLine, FaLightbulb, FaRocket, FaUsers, FaBullseye } from 'react-icons/fa';
+import { FaBrain, FaClock, FaChartLine, FaLightbulb, FaRocket, FaBullseye } from 'react-icons/fa';
 import TaskAnalytics from '../components/TaskAnalytics';
 import PriorityBasedSuggestions from '../components/PriorityBasedSuggestions';
 import './SmartFeatures.css';

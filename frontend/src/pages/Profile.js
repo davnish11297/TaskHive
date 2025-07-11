@@ -1,7 +1,7 @@
 import React from 'react';
 import '../Home.css';
 import '../Profile.css';
-import { FaUserCircle, FaCamera, FaStar, FaMapMarkerAlt, FaDollarSign, FaUserEdit, FaEnvelope, FaTasks, FaCheckCircle, FaGavel, FaSyncAlt } from 'react-icons/fa';
+import { FaUserCircle, FaStar, FaMapMarkerAlt, FaDollarSign, FaUserEdit, FaEnvelope, FaTasks, FaCheckCircle, FaGavel, FaSyncAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useUserProfile } from '../UserProfileContext';
 
