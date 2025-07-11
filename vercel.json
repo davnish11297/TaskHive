@@ -27,10 +27,5 @@
     "MONGODB_URI": "@mongodb_uri",
     "JWT_SECRET": "@jwt_secret",
     "REACT_APP_API_URL": "https://your-vercel-app-name.vercel.app"
-  },
-  "functions": {
-    "backend/server.js": {
-      "maxDuration": 30
-    }
   }
 } 
