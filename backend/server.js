@@ -2,13 +2,13 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const taskRoutes = require('./routes/taskRoutes');
-const http = require("http"); // Import http module
+const http = require("http");
 const { Server } = require("socket.io");
 require('dotenv').config();
 
-const { request } = require('express');
 const mongoose = require('mongoose');
 
+// Create HTTP server
 const server = http.createServer(app);
 
 const allowedOrigins = [
@@ -18,15 +18,10 @@ const allowedOrigins = [
 ];
 
 const cors = require('cors');
-// app.use(cors({
-//   origin: allowedOrigins, 
-//   methods: "GET,POST,PUT,DELETE,PATCH",
-//   allowedHeaders: "Content-Type,Authorization",
-//   credentials: true
-// }));
 
 console.log("Current environment:", process.env.NODE_ENV);
 
+// Initialize Socket.IO
 const io = new Server(server, {
   cors: {
       origin: "*",
@@ -62,7 +57,6 @@ io.on("connection", (socket) => {
 
 // API routes
 app.use('/api/auth', require('./routes/authRoutes'));
-
 app.use('/api/tasks', taskRoutes);
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://sdavnish:davnish7@cluster0.dfy8i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
@@ -83,17 +77,11 @@ const notificationRoutes = require('./routes/notificationRoutes');
 app.use('/api', notificationRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// For Vercel deployment, use the server instance
+// Single server instance for both HTTP and WebSocket
 const PORT = process.env.PORT || 5001;
-if (process.env.NODE_ENV === 'production') {
-  // In production (Vercel), use the server instance
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-} else {
-  // In development, use separate ports for WebSocket and HTTP
-  server.listen(5002, () => console.log("⚡ WebSocket running on port 5002"));
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Export for Vercel
+module.exports = app;
