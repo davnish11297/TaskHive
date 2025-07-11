@@ -60,14 +60,12 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(5002, () => console.log("⚡ WebSocket running on port 5002"));
-
 // API routes
 app.use('/api/auth', require('./routes/authRoutes'));
 
 app.use('/api/tasks', taskRoutes);
 
-mongoose.connect('mongodb+srv://sdavnish:davnish7@cluster0.dfy8i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://sdavnish:davnish7@cluster0.dfy8i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
     serverSelectionTimeoutMS: 30000,
 })
   .then(() => console.log('Connected to MongoDB'))
@@ -85,7 +83,17 @@ const notificationRoutes = require('./routes/notificationRoutes');
 app.use('/api', notificationRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+// For Vercel deployment, use the server instance
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV === 'production') {
+  // In production (Vercel), use the server instance
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+} else {
+  // In development, use separate ports for WebSocket and HTTP
+  server.listen(5002, () => console.log("⚡ WebSocket running on port 5002"));
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
