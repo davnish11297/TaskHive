@@ -37,6 +37,9 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+// Serve uploads directory for profile images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // Pass `io` to routes
 app.use((req, res, next) => {
   req.io = io;
@@ -62,7 +65,7 @@ server.listen(5002, () => console.log("⚡ WebSocket running on port 5002"));
 // API routes
 app.use('/api/auth', require('./routes/authRoutes'));
 
-app.use('/api', taskRoutes);
+app.use('/api/tasks', taskRoutes);
 
 mongoose.connect('mongodb+srv://sdavnish:davnish7@cluster0.dfy8i.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
     serverSelectionTimeoutMS: 30000,
@@ -80,6 +83,7 @@ app.use('/user', userRoutes);
 
 const notificationRoutes = require('./routes/notificationRoutes');
 app.use('/api', notificationRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

@@ -1,277 +1,114 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import "../../src/Profile.css"; // Add this CSS file if you haven't already
-import { FaEdit, FaTrash, FaArrowLeft } from "react-icons/fa";
-import io from "socket.io-client";
-import socket from "../socket";
-import moment from "moment";
+import React from 'react';
+import '../Home.css';
+import '../Profile.css';
+import { FaUserCircle, FaCamera, FaStar, FaMapMarkerAlt, FaDollarSign, FaUserEdit, FaEnvelope, FaTasks, FaCheckCircle, FaGavel, FaSyncAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { useUserProfile } from '../UserProfileContext';
 
 const Profile = () => {
-    const [tasks, setTasks] = useState([]);
-    const [user, setUser] = useState(null);
-    const navigate = useNavigate();
-    const [editingTask, setEditingTask] = useState(null);
-    const [editedTask, setEditedTask] = useState({ title: "", description: "", budget: "", deadline: "" });
-    const [notifications, setNotifications] = useState([]);
+  const { user, loading, error, refreshProfile } = useUserProfile();
+  const navigate = useNavigate();
 
-    const if_live = false;
-    const API_URL = if_live 
-        ? "https://taskhive-d0c8.onrender.com" 
-        : "http://localhost:5001";
+  if (loading) return <div className="profile-loading">Loading profile...</div>;
+  if (error) return <div className="profile-error">{error}</div>;
+  if (!user) return <div className="profile-error">No user data found.</div>;
 
-    const socket = io("http://localhost:5002"); // Connect to backend WebSocket
+  // Example stats (replace with real data if available)
+  const totalTasks = user.tasks ? user.tasks.length : 0;
+  const completedTasks = user.tasks ? user.tasks.filter(t => t.status === 'COMPLETED').length : 0;
+  // Optionally, you can pass activeBids as a prop or fetch it from context
+  const activeBids = user.activeBids || 0;
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-    function formatDate(isoString) {
-        const date = new Date(isoString);
-    
-        // Formatting the date as "Month Day, Year"
-        const readableDate = `${date.toLocaleString('en-US', { month: 'long' })} ${date.getDate()}, ${date.getFullYear()}`;
-        
-        return readableDate;
-    }
+  // Profile image logic
+  let profilePic = user.profilePicture || '/default-avatar.png';
+  if (profilePic && !profilePic.startsWith('http') && profilePic !== '/default-avatar.png') {
+    profilePic = API_URL + profilePic;
+  }
 
-    const formatDateForInput = (dateString) => {
-        const date = new Date(dateString);
-        return date.toISOString().split("T")[0]; // Converts to "yyyy-MM-dd"
-    };
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                console.log(token);
-                if (!token) return;
-        
-                const response = await axios.get(`${API_URL}/user/profile`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-        
-                setUser(response.data);
-            } catch (error) {
-                console.error("Error fetching user:", error);
-            }
-        };
-
-        fetchProfile();
-    }, [API_URL, tasks]);
-
-    useEffect(() => {
-        if (!user) return;
-    
-        socket.emit("join", user._id);
-    
-        socket.on("notification", (message) => {
-            setNotifications((prev) => [...prev, { message, isRead: false }]);
-        });
-    
-        return () => {
-            socket.off("notification"); // Clean up event listener
-        };
-    }, [user]);
-
-    const handleDeleteTask = async (taskId) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
-            console.log(taskId)
-
-            await axios.delete(`${API_URL}/api/tasks/${taskId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            // Remove the deleted task from the user data in state
-            setUser((prevState) => ({
-                ...prevState,
-                tasks: prevState.tasks.filter((task) => task._id !== taskId)
-            }));
-
-            alert("Task deleted successfully!");
-        } catch (error) {
-            console.error("Error deleting task:", error);
-            alert("Failed to delete task.");
-        }
-    };
-
-    // Open Edit Modal
-    const handleEditClick = (task) => {
-        setEditingTask(task);
-        setEditedTask({ 
-            title: task.title, 
-            description: task.description, 
-            budget: task.budget, 
-            deadline: formatDateForInput(task.deadline)
-        });
-    };
-
-    // Handle Input Change
-    const handleInputChange = (e) => {
-        setEditedTask({ ...editedTask, [e.target.name]: e.target.value });
-    };
-
-    // Submit Edited Task
-    const handleEditSubmit = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const response = await axios.put(`${API_URL}/api/tasks/${editingTask._id}`, editedTask, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            // Ensure the updated data is coming from the response
-            setTasks(prevTasks => prevTasks.map(task => 
-                task._id === editingTask._id ? response.data : task
-            ));
-
-            setEditingTask(null); // Close the modal after saving
-        } catch (error) {
-            console.error("Error updating task:", error);
-        }
-    };
-
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const response = await axios.get(`${API_URL}/api/notifications`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setNotifications(response.data);
-            } catch (error) {
-                console.log('Error fetching notifications:', error);
-            }
-        };
-    
-        fetchNotifications();
-
-        // Listen for real-time notifications
-        socket.on("notification", (newNotification) => {
-            setNotifications((prev) => [...prev, newNotification]);
-        });
-
-        return () => {
-            socket.off("notification"); // Cleanup
-        };
-    }, []);
-
-    useEffect(() => {
-        socket.on("connect", () => {
-            console.log("Connected to WebSocket");
-        });
-    
-        return () => {
-            socket.off("connect"); // Remove listener instead of disconnecting socket
-        };
-    }, []);
-
-    const goBack = () => {
-        navigate(-1); // Go back to the previous page
-    };
-
-    const removeNotification = (index) => {
-        setNotifications(notifications.filter((_, i) => i !== index));
-    };
-
-    const markAsRead = async (id) => {
-        try {
-          const res = await axios.put(`${API_URL}/api/notifications/${id}/read`);
-          console.log(res)
-          setNotifications(notifications.filter(notification => notification._id !== id));
-        } catch (error) {
-          console.error("Error marking notification as read:", error);
-        }
-    };
-
-    if (!user) return <p>Loading profile...</p>;
-
-    return (
-        <div className="profile-container">
-
-            {/* Back Button */}
-            <button onClick={goBack} className="back-button">← Back</button>
-
-            <h2 className="section-title">📢 Notifications</h2>
-            <div className="notifications-container">
-                {notifications.length > 0 ? (
-                    notifications.map((notification, index) => (
-                        <div key={index} className="notification-card">
-                            <p>🔔 {notification.message} <br />
-                                <small className="time-ago">{moment(notification.createdAt).fromNow()}</small>
-                            </p>
-                            <button className="close-btn" onClick={() => markAsRead(notification._id)}>✖</button>
-                        </div>
-                    ))
-                ) : (
-                    <p className="no-notifications">No new notifications</p>
-                )}
-            </div>
-
-            {/* Profile Section */}
-            <div className="profile-section">
-                <img src={user.profilePicture || "/default-avatar.png"} alt="Profile" className="profile-pic" />
-                <h2>{user.name || "Davnish Singh"}</h2>
-                <p>Email: {user.email || "davnishsingh46@gmail.com"}</p>
-                <p><b>Bio:</b> {user.bio || "Davnish is one of the producers of Soorma & Dhadak and producing upcoming movies Jabariya Jodi and Bharat along with Salman Khan Films, Eros International & Dharma Productions. Trailer Editor of Gully Boy, Simmba, SANJU, Dhadak, Soorma and 200+ Bollywood movie trailers. He’s been working in the Film industry since last 7 years and, till now he has worked in Hollywood movies like Fate Of The Furious & Jumanji as its lead Trailer editor with his upcoming films are no less than blockbusters. He is working on a number of Hollwood films like Avengers 4(2019), Red Notice, Jumanji 2, Hobbs & Shaw and Fast & Furious 9(2020) as a Head of Editorial Department with his own production house involved in it."}</p>
-                <p>Role: {user.role || "No role assigned"}</p>
-                {user.isVerified && <span className="verified-badge">✔ Verified</span>}
-            </div>
-
-            {/* Tasks Section */}
-            <div className="tasks-section">
-                {user.tasks && user.tasks.map((task) => (
-                    <div className="task-item" key={task._id}>
-                        <h4>{task.title}</h4>
-
-                        <div className="task-actions">
-                            <FaEdit className="edit-icon" onClick={() => handleEditClick(task)} />
-                            {/* <FaTrash className="delete-icon" onClick={() => handleDeleteTask(task._id)} /> */}
-                        </div>
-
-                        <p>{task.description}</p>
-                        <p>Budget: ${task.budget}</p>
-                        <p>
-                            <strong>Deadline:</strong> {formatDate(task.deadline)}
-                        </p>
-                        {task.category && (
-                            <p className="task-category">{task.category}</p>
-                        )}
-
-                        <button 
-                            className="delete-btn"
-                            onClick={() => handleDeleteTask(task._id)}
-                        >
-                            Delete Task
-                        </button>
-                    </div>
-                ))}
-            </div>
-
-            {/* Edit Task Modal */}
-            {editingTask && (
-                <div className="modal">
-                    <div className="modal-content">
-                        <h2>Edit Task</h2>
-                        <label>Title:</label>
-                        <input type="text" name="title" value={editedTask.title} onChange={handleInputChange} />
-
-                        <label>Description:</label>
-                        <textarea name="description" value={editedTask.description} onChange={handleInputChange} />
-
-                        <label>Deadline:</label>
-                        <input type="date" name="deadline" value={editedTask.deadline} onChange={handleInputChange} />
-
-                        <label>Budget:</label>
-                        <input type="number" name="budget" value={editedTask.budget} onChange={handleInputChange} />
-
-                        <button className="save-button" onClick={handleEditSubmit}>Save</button>
-                        <button className="cancel-button" onClick={() => setEditingTask(null)}>Cancel</button>
-                    </div>
-                </div>
+  return (
+    <div className="profile-bg">
+      <div className="profile-main">
+        {/* Left: Avatar, Name, Role, Edit */}
+        <div className="profile-card profile-card-left">
+          <div className="profile-avatar-wrapper">
+            {user.profilePicture ? (
+              <img src={profilePic} alt="Profile" className="profile-avatar" />
+            ) : (
+              <FaUserCircle className="profile-avatar default" />
             )}
-
+          </div>
+          <h2 className="profile-name" style={{ marginTop: 16 }}>{user.name || user.email}</h2>
+          <span className={`user-role-badge ${user.role === 'task_poster' ? 'poster' : 'freelancer'}`}>{user.role === 'task_poster' ? 'Task Poster' : 'Freelancer'}</span>
+          <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+            <button className="profile-edit-btn" onClick={() => navigate('/profile/edit')}>
+              <FaUserEdit style={{ marginRight: 6 }} /> Edit Profile
+            </button>
+            <button 
+              className="profile-edit-btn" 
+              onClick={refreshProfile}
+              style={{ background: '#f3f8ff', color: '#2563eb', border: '1px solid #e0e7ef' }}
+            >
+              <FaSyncAlt style={{ marginRight: 6 }} /> Refresh
+            </button>
+          </div>
+          {/* Stats Section */}
+          <div className="profile-stats-flex" style={{ marginTop: 32, width: '100%', justifyContent: 'center', gap: 24 }}>
+            <div className="profile-stat" style={{ background: '#f0f9ff', borderRadius: 12, padding: 16, minWidth: 90, textAlign: 'center' }}>
+              <FaTasks color="#38bdf8" size={22} style={{ marginBottom: 4 }} />
+              <div className="profile-stat-value" style={{ fontWeight: 700, fontSize: 20 }}>{totalTasks}</div>
+              <div className="profile-stat-label" style={{ color: '#38bdf8' }}>Tasks</div>
+            </div>
+            <div className="profile-stat" style={{ background: '#f0fdf4', borderRadius: 12, padding: 16, minWidth: 90, textAlign: 'center' }}>
+              <FaCheckCircle color="#22c55e" size={22} style={{ marginBottom: 4 }} />
+              <div className="profile-stat-value" style={{ fontWeight: 700, fontSize: 20 }}>{completedTasks}</div>
+              <div className="profile-stat-label" style={{ color: '#22c55e' }}>Completed</div>
+            </div>
+            <div className="profile-stat" style={{ background: '#fef9c3', borderRadius: 12, padding: 16, minWidth: 90, textAlign: 'center' }}>
+              <FaGavel color="#facc15" size={22} style={{ marginBottom: 4 }} />
+              <div className="profile-stat-value" style={{ fontWeight: 700, fontSize: 20 }}>{activeBids}</div>
+              <div className="profile-stat-label" style={{ color: '#facc15' }}>Active Bids</div>
+            </div>
+          </div>
         </div>
-    );
+        {/* Right: Details */}
+        <div className="profile-card profile-card-right">
+          <div className="profile-info-card-modern">
+            <h2 className="profile-info-title" style={{ color: '#2563eb', marginBottom: 18 }}>Profile Details</h2>
+            <div className="profile-info-row-flex">
+              <span className="profile-info-label"><FaEnvelope style={{ marginRight: 8, color: '#2563eb' }} />Email:</span>
+              <span className="profile-info-value">{user.email}</span>
+            </div>
+            {user.bio && (
+              <div className="profile-info-row-flex">
+                <span className="profile-info-label"><FaUserCircle style={{ marginRight: 8, color: '#a21caf' }} />Bio:</span>
+                <span className="profile-info-value">{user.bio}</span>
+              </div>
+            )}
+            {user.location && (
+              <div className="profile-info-row-flex">
+                <span className="profile-info-label"><FaMapMarkerAlt style={{ marginRight: 8, color: '#f43f5e' }} />Location:</span>
+                <span className="profile-info-value">{user.location}</span>
+              </div>
+            )}
+            {user.hourlyRate && (
+              <div className="profile-info-row-flex">
+                <span className="profile-info-label"><FaDollarSign style={{ marginRight: 8, color: '#16a34a' }} />Hourly Rate:</span>
+                <span className="profile-info-value">${user.hourlyRate}/hr</span>
+              </div>
+            )}
+            {user.skills && user.skills.length > 0 && (
+              <div className="profile-info-row-flex">
+                <span className="profile-info-label"><FaStar style={{ marginRight: 8, color: '#f59e42' }} />Skills:</span>
+                <span className="profile-info-value">{Array.isArray(user.skills) ? user.skills.join(', ') : user.skills}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Profile;

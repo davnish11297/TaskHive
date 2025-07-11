@@ -1,760 +1,214 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import '../../src/Home.css';
 import { useNavigate } from 'react-router-dom';
+import { FaPlusCircle, FaSearch, FaGift, FaChartLine, FaClock, FaStar, FaUserCircle } from 'react-icons/fa';
 
 const Home = () => {
     const [tasks, setTasks] = useState([]);
-    const [selectedTask, setSelectedTask] = useState(null); 
     const [bids, setBids] = useState([]);
-    const [error, setError] = useState(null);
-    const [newTask, setNewTask] = useState({
-        title: '',
-        description: '',
-        budget: '',
-        deadline: '',
-        status: 'PENDING',
-        category: '',
-        tags: '',
-        postedBy: ''
-    });
-    const [loading, setLoading] = useState(true);
-    const [taskBids, setTaskBids] = useState({}); // Object to store bids for each task
     const [userToken] = useState(localStorage.getItem('token'));
-    const [userRole, setUserRole] = useState(null);
-    const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filteredTasks, setFilteredTasks] = useState(tasks);
-    const [categoryFilter, setCategoryFilter] = useState('');
-    const [tagFilter, setTagFilter] = useState('');
     const [user, setUser] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState(""); // Track selected category
-    const [selectedTags, setSelectedTags] = useState([]);
+    const [userRole, setUserRole] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [bidsLoading, setBidsLoading] = useState(true);
+    const navigate = useNavigate();
 
-    const if_live = false;
-    const API_URL = if_live 
-        ? "https://taskhive-d0c8.onrender.com" 
-        : "http://localhost:5001";
+    const API_URL = "http://localhost:5001";
 
     useEffect(() => {
         if (userToken) {
-            const decodedToken = jwtDecode(userToken); // Decode the JWT token
-            console.log(decodedToken)
-            setUserRole(decodedToken.role);  // Assuming role is in the decoded token payload
-            setUser(decodedToken.name)
+            const decodedToken = jwtDecode(userToken);
+            setUserRole(decodedToken.role);
+            if (decodedToken.name) {
+                setUser(decodedToken.name);
+            } else {
+                axios.get(`${API_URL}/user/profile`, {
+                    headers: { Authorization: `Bearer ${userToken}` },
+                }).then(res => {
+                    setUser(res.data.name || 'User');
+                }).catch(() => setUser('User'));
+            }
         }
     }, [userToken]);
 
-    const handleCategoryClick = (category) => {
-        setCategoryFilter(category); // ✅ This updates the input field
-    };
-
-    const handleRemoveTag = (tagToRemove) => {
-        setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
-    };
-
-    const fetchTasks = useCallback(async () => {
-        try {
-            const query = [];
-            if (categoryFilter) query.push(`category=${categoryFilter}`);
-            if (tagFilter) query.push(`tag=${tagFilter}`);
-
-            console.log(`${API_URL}/api/tasks?${query.join('&')}`)
-
-            const response = await axios.get(`${API_URL}/api/tasks?${query.join('&')}`, {
-                headers: { Authorization: `Bearer ${userToken}` },
-            });
-
-            const fetchedTasks = response.data.tasks;
-
-            setTasks(fetchedTasks);
-            setFilteredTasks(fetchedTasks);
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
-            setLoading(false);
-        }
-    }, [userToken, categoryFilter, tagFilter, API_URL]);
-
     useEffect(() => {
-        fetchTasks();
-    }, [fetchTasks]);
-
-    const handleCategoryFilterChange = (e) => {
-        setCategoryFilter(e.target.value);
-        fetchTasks(e.target.value, tagFilter);
-    };
-    
-    const handleTagFilterChange = (e) => {
-        setTagFilter(e.target.value);
-        fetchTasks(categoryFilter, e.target.value);
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'tags') {
-            setNewTask((prevTask) => ({
-                ...prevTask,
-                [name]: value.split(',').map((tag) => tag.trim()) // Split into an array of tags
-            }));
-        } else {
-            setNewTask((prevTask) => ({
-                ...prevTask,
-                [name]: value
-            }));
-        }
-    };
-
-    const handleCreateTask = async (e) => {
-        e.preventDefault();
-        if (!newTask.title.trim() || !newTask.description.trim() || !newTask.deadline || !newTask.category) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-
-        console.log("Task being sent:", newTask); // Check if category exists
-
-        try {
-            await axios.post(`${API_URL}/api/tasks`, newTask, {
-                headers: { Authorization: `Bearer ${userToken}` },
-            });
-
-            setNewTask({ 
-                title: '', 
-                description: '', 
-                budget: '', 
-                deadline: '', 
-                status: 'PENDING', 
-                category: '', 
-                tags: '', 
-                postedBy: user });
-
-            fetchTasks();
-        } catch (err) {
-            console.error('Error creating task:', err);
-            alert('Error creating task. Please check all fields.');
-        }
-    };
-
-    const handleStatusChange = async (taskId, newStatus) => {
-        try {
-            await axios.patch(
-                `${API_URL}/api/tasks/${taskId}/status`,
-                { status: newStatus.toUpperCase() },
-                {
-                    headers: {
-                        Authorization: `Bearer ${userToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            setTasks((prevTasks) =>
-                prevTasks.map((task) =>
-                    task._id === taskId ? { ...task, status: newStatus.toUpperCase() } : task
-                )
-            );
-        } catch (error) {
-            console.error('Error updating status:', error);
-        }
-    };
-
-    const handleAcceptBid = async (taskId, bidId) => {
-        try {
-            await axios.patch(
-                `${API_URL}/api/tasks/accept/${bidId}`,
-                { bidId },
-                {
-                    headers: {
-                        Authorization: `Bearer ${userToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            await handleStatusChange(taskId, 'IN_PROGRESS');
-            handleCloseModal(); 
-        } catch (error) {
-            console.error('Error accepting bid:', error);
-            const errorMessage = error.response ? error.response.data.message : error.message;
-            setError(errorMessage);
-        }
-    };
-
-    const token = localStorage.getItem('token');
-    const handleBid = async (taskId, bidAmount, estimatedCompletion, message) => {
-        try {
-            await axios.post(
-                `${API_URL}/api/tasks/${taskId}/bid`,
-                { bidAmount, estimatedCompletion, message },
-                { headers: { 
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json' } }
-            );
-
-            // After placing the bid, change the task status to "In Progress"
-            await handleStatusChange(taskId, 'IN_PROGRESS');  // Update the task status
-            
-            // Update task with the new highest bid
-            fetchTasks();
-        } catch (error) {
-            console.error('Error placing bid:', error);
-        }
-    };
-
-    const handleBidChange = (taskId, e) => {
-        const { value } = e.target;
-        setTaskBids((prevBids) => ({
-            ...prevBids,
-            [taskId]: { ...prevBids[taskId], bidAmount: value }, // Store bid value for specific task
-        }));
-    };
-
-    const handleEstimatedCompletionChange = (taskId, e) => {
-        const { value } = e.target;
-        setTaskBids((prevBids) => ({
-            ...prevBids,
-            [taskId]: { ...prevBids[taskId], estimatedCompletion: value }, // Store estimated completion for specific task
-        }));
-    };
-
-    const handleMessageChange = (taskId, e) => {
-        const { value } = e.target;
-        setTaskBids((prevBids) => ({
-            ...prevBids,
-            [taskId]: { ...prevBids[taskId], message: value }, // Store message for specific task
-        }));
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        setUserRole(null);
-        navigate('/login');
-    };
-
-    const taskStatusGroups = filteredTasks.reduce((acc, task) => {
-        if (!acc[task.status]) {
-            acc[task.status] = [];
-        }
-        acc[task.status].push(task);
-        return acc;
-    }, { PENDING: [], IN_PROGRESS: [], COMPLETED: [] });
-
-    function formatDate(isoString) {
-        const date = new Date(isoString);
-    
-        // Formatting the date as "Month Day, Year"
-        const readableDate = `${date.toLocaleString('en-US', { month: 'long' })} ${date.getDate()}, ${date.getFullYear()}`;
-        
-        return readableDate;
-    }
-
-    // ✅ Fetch Bids When Task is Clicked
-    const handleTaskClick = async (task) => {
-        setSelectedTask(task);
-        try {
-            const response = await axios.get(`${API_URL}/api/tasks/${task._id}/bids`, {
-                headers: { Authorization: `Bearer ${userToken}` },
-            });
-            console.log(response.data)
-            setBids(response.data); // Set fetched bids
-        } catch (error) {
-            console.error('Error fetching bids:', error);
-            setBids([]); // Clear bids if error occurs
-        }
-    };
-
-    const handleCloseModal = () => {
-        setSelectedTask(null);
-        setBids([]); // Clear bids when closing modal
-    };
-
-    const handleRejectBid = async (taskId, bidId) => {
-        try {
-            // Make an API call to reject the bid
-            const response = await axios.patch(
-                `${API_URL}/api/tasks/reject/${bidId}`,
-                {}, // No body needed, assuming you only need the bid ID for rejection
-                {
-                    headers: {
-                        Authorization: `Bearer ${userToken}`,
-                    }
-                }
-            );
-            
-            // Handle the response (you can update state or show a message)
-            console.log('Bid rejected:', response.data);
-            
-            // Update the task status or any other UI updates if necessary
-        } catch (error) {
-            console.error('Error rejecting the bid:', error.response ? error.response.data : error.message);
-        }
-    };
-
-    useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            setFilteredTasks(
-                tasks.filter(task => {
-                    // Convert search query to lowercase
-                    const query = searchQuery.toLowerCase();
-                    
-                    // Search filter (title or description must match searchQuery)
-                    const matchesSearch = 
-                        task.title.toLowerCase().includes(query) ||
-                        task.description.toLowerCase().includes(query);
-    
-                    // Tags filter (if selectedTags is not empty, task must contain at least one of the selected tags)
-                    const matchesTags = 
-                        selectedTags.length === 0 || 
-                        selectedTags.some(tag => task.tags.includes(tag));
-    
-                    return matchesSearch && matchesTags;
-                })
-            );
-        }, 300);  // Delay for better performance
-    
-        return () => clearTimeout(delayDebounce);
-    }, [searchQuery, tasks, selectedTags]);
-
-    useEffect(() => {
-        const fetchUser = async () => {
+        const fetchTasks = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const response = await axios.get(`${API_URL}/user/profile`, {
-                    headers: { Authorization: `Bearer ${token}` },
+                const response = await axios.get(`${API_URL}/api/tasks`, {
+                    headers: { Authorization: `Bearer ${userToken}` },
                 });
-                setUser(response.data);
+                setTasks(response.data.tasks);
+                setLoading(false);
             } catch (error) {
-                console.error("Error fetching user:", error);
+                setLoading(false);
             }
         };
+        fetchTasks();
+    }, [userToken]);
 
-        fetchUser();
-    }, []);
+    useEffect(() => {
+        const fetchBids = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/api/bids/my`, {
+                    headers: { Authorization: `Bearer ${userToken}` },
+                });
+                setBids(response.data);
+                setBidsLoading(false);
+            } catch (error) {
+                setBidsLoading(false);
+            }
+        };
+        fetchBids();
+    }, [userToken]);
+
+    // Stats
+    const tasksPosted = tasks.length;
+    const activeBids = bids.length;
+    const completed = tasks.filter(t => t.status === 'COMPLETED').length;
+    const rating = 0.0; // Replace with real data if available
+
+    // Recent tasks (show 2 most recent)
+    const recentTasks = tasks.slice(0, 2);
+    // Recent bids (show 2 most recent)
+    const recentBids = bids.slice(0, 2);
 
     return (
-        <div className="home-container">
-            {/* Left Side: Form */}
-            <div className="task-form-container">
-                <div className="logo-container">
-                    <img className="logo" src={`${window.location.origin}/taskhive-logo.png`} alt="TaskHive Logo" />
-                </div>
-                <center>
-                    {/* <h1>TaskHive 🐝</h1> */}
-                    <h2>Create Task</h2>
-                </center>
-                <form onSubmit={handleCreateTask} className="task-form">
-                    <input
-                        type="text"
-                        name="title"
-                        value={newTask.title}
-                        onChange={handleChange}
-                        placeholder="Task Title"
-                        required
-                    />
-                    <textarea
-                        name="description"
-                        value={newTask.description}
-                        onChange={handleChange}
-                        placeholder="Task Description"
-                        required
-                    />
-                    <input
-                        type="number"
-                        name="budget"
-                        value={newTask.budget}
-                        onChange={handleChange}
-                        placeholder="Budget"
-                    />
-                    <input
-                        type="date"
-                        name="deadline"
-                        value={newTask.deadline}
-                        onChange={handleChange}
-                        required
-                    />
-                    <select name="task_status" className="status-dropdown" required>
-                        <option value="PENDING">Pending</option>
-                        <option value="IN_PROGRESS">In Progress</option>
-                        <option value="COMPLETED">Completed</option>
-                    </select>
+        <div className="dashboard-root">
+            {/* Welcome Section */}
+            <section className="dashboard-welcome">
+                <h1>Welcome back, {user || 'User'}! <span role="img" aria-label="wave">👋</span></h1>
+                <p>Ready to tackle some tasks or find your next opportunity?</p>
+            </section>
 
-                    <select className="category-dropdown"
-                        value={newTask.category || ''} 
-                        onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
-                    >
-                        <option value="">Select a category</option>
-                        <option value="Web Development">Web Development</option>
-                        <option value="Graphic Design">Graphic Design</option>
-                        <option value="Writing">Writing</option>
-                    </select>
-                    
-                    <input
-                        type="text"
-                        name="tags"
-                        value={newTask.tags}
-                        onChange={handleChange}
-                        placeholder="Comma separated tags"
-                    />
-                    <button type="submit" className="add-task-btn">
-                        Add Task
-                    </button>
-                </form>
-            </div>
-
-            <div>
-                <nav className="navbar">
-                    <p className='navHomeRoleTitle'>Current Role: {userRole === 'task_poster' ? 'Task Poster' : 'Freelancer'}</p>
-
-                    <input 
-                        type="text" 
-                        placeholder="Search tasks..." 
-                        value={searchQuery} 
-                        onChange={(e) => setSearchQuery(e.target.value)} 
-                        className="search-bar"
-                    />
-
-                    <input
-                        type="text"
-                        value={categoryFilter}
-                        onChange={handleCategoryFilterChange}
-                        placeholder="Filter by Category"
-                        className='category-filter'
-                    />
-
-                    {/* Profile Icon */}
-                    <div className="profile-container" onClick={() => navigate("/profile")}>
-                        <img
-                            src={user?.profilePicture || "/default-avatar.png"} 
-                            alt="Profile"
-                            className="profile-icon"
-                        />
+            {/* Action Cards */}
+            <section className="dashboard-actions">
+                {userRole === 'task_poster' && (
+                  <div className="dashboard-action-card post-task" onClick={() => navigate('/tasks/create')}>
+                      <div className="dashboard-action-icon"><FaPlusCircle size={32} /></div>
+                      <div>
+                          <h3>Post a Task</h3>
+                          <p>Get help with your project</p>
+                      </div>
+                  </div>
+                )}
+                <div className="dashboard-action-card browse-tasks" onClick={() => navigate('/tasks')}>
+                    <div className="dashboard-action-icon"><FaSearch size={32} /></div>
+                    <div>
+                        <h3>Browse Tasks</h3>
+                        <p>Find your next opportunity</p>
                     </div>
-
-                    <button className="logout-btn" onClick={handleLogout}>
-                        Logout
-                    </button>
-                </nav>
-            </div>
-
-            {/* {console.log("Selected Tags:", selectedTags)} */}
-
-            {selectedTags.length > 0 && (  // 👈 Only render if there are selected tags
-                <div className="selected-tags-container">
-                    {selectedTags.map((tag, index) => (
-                        <span key={index} className="selected-tag">
-                            {tag} 
-                            <button className="remove-tag" onClick={() => 
-                                setSelectedTags(prevTags => prevTags.filter(t => t !== tag))
-                            }>
-                                ✖
-                            </button>
-                        </span>
-                    ))}
                 </div>
-            )}
+            </section>
 
-            {/* Right Side: Task Listings */}
-            <div className="task-list-container">
-                {loading ? (
-                   <div className="loading-spinner"></div>
-                ) : filteredTasks.length === 0 ? (
-                    <p>No tasks found. Create your first task!</p>
-                ) : (
-                    <>
-                        {/* Pending Tasks */}
-                        <div className="status-section">
-                            <h3>Pending</h3>
-                            <hr />
-                            <div className="task-row">
-                                {taskStatusGroups.PENDING.map((task) => (
-                                    <div key={task._id} className="task-item" onClick={() => handleTaskClick(task)}>
+            {/* Stats Cards */}
+            <section className="dashboard-stats">
+                <div className="dashboard-stat-card">
+                    <div className="dashboard-stat-label">Tasks Posted</div>
+                    <div className="dashboard-stat-value">{tasksPosted}</div>
+                    <div className="dashboard-stat-icon"><FaGift /></div>
+                </div>
+                <div className="dashboard-stat-card">
+                    <div className="dashboard-stat-label">Active Bids</div>
+                    <div className="dashboard-stat-value">{activeBids}</div>
+                    <div className="dashboard-stat-icon"><FaChartLine /></div>
+                </div>
+                <div className="dashboard-stat-card">
+                    <div className="dashboard-stat-label">Completed</div>
+                    <div className="dashboard-stat-value">{completed}</div>
+                    <div className="dashboard-stat-icon"><FaClock /></div>
+                </div>
+                <div className="dashboard-stat-card">
+                    <div className="dashboard-stat-label">Rating</div>
+                    <div className="dashboard-stat-value">{rating.toFixed(1)}</div>
+                    <div className="dashboard-stat-icon"><FaStar /></div>
+                </div>
+            </section>
 
-                                        {/* Tags */}
-                                        <div className="task-tags">
-                                            {task.tags && task.tags.length > 0 ? (
-                                                task.tags.map((tag, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="task-tag clickable"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // Prevent opening the bidding modal
-                                                            if (!selectedTags.includes(tag)) {
-                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
-                                                            }
-                                                        }}
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))
-                                            ) : null}
-                                        </div>
-
-                                        <div className="task-item-header">{task.title}</div>
-                                        <div className="task-item-content">
-                                            <p>{task.description}</p>
-                                            <p>
-                                                <strong>Budget:</strong> ${task.budget}
-                                            </p>
-                                            <p>
-                                                <strong>Deadline:</strong> {formatDate(task.deadline)}
-                                            </p>
-
-                                            {/* Category */}
-                                            {task.category && (
-                                                <p className="task-category" 
-                                                onClick={(e) => {  
-                                                    e.stopPropagation();  // Prevents the click from triggering parent events  
-                                                    setCategoryFilter(task.category);  // Updates the category filter  
-                                                }}>
-                                                    {task.category}
-                                                </p>
-                                            )}
-
-                                            {userRole === 'freelancer' ? (
-                                                <>
-                                                    {/* Bidding Section */}
-                                                    <div className="bid-section">
-                                                        <input
-                                                            type="number"
-                                                            placeholder="Place your bid"
-                                                            min="1"
-                                                            value={taskBids[task._id]?.bidAmount || ''} // Get bid value for this specific task
-                                                            onChange={(e) => handleBidChange(task._id, e)} // Update bid for this task
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        />
-                                                        <input
-                                                            type="date"
-                                                            placeholder="Estimated Completion"
-                                                            value={taskBids[task._id]?.estimatedCompletion || ''} // Get estimated completion for this specific task
-                                                            onChange={(e) => handleEstimatedCompletionChange(task._id, e)} // Update estimated completion for this task
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        />
-                                                        <textarea
-                                                            placeholder="Message"
-                                                            value={taskBids[task._id]?.message || ''} // Get message for this specific task
-                                                            onChange={(e) => handleMessageChange(task._id, e)} // Update message for this task
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        />
-                                                        <button
-                                                            className="bid-btn"
-                                                            onClick={() => handleBid(task._id, taskBids[task._id]?.bidAmount || '', taskBids[task._id]?.estimatedCompletion || '', taskBids[task._id]?.message || '')}
-                                                        >
-                                                            Place Bid
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            ) : <div></div>}
-                                        </div>
-                                        <div className="task-status">
-                                            <select
-                                                className="status-dropdown"
-                                                value={task.status}
-                                                onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <option value="PENDING">Pending</option>
-                                                <option value="IN_PROGRESS">In Progress</option>
-                                                <option value="COMPLETED">Completed</option>
-                                            </select>
-                                        </div>
+            {/* Main Grid: Recent Tasks & My Recent Bids */}
+            <div style={{display: 'flex', gap: 32, maxWidth: 1200, margin: '0 auto'}}>
+                {/* Recent Tasks */}
+                <section className="dashboard-recent-tasks" style={{flex: 1}}>
+                    <div className="dashboard-recent-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <h2>Recent Tasks</h2>
+                        <button className="dashboard-view-all" onClick={() => navigate('/tasks')}>View All</button>
+                    </div>
+                    <div className="dashboard-recent-list">
+                        {loading ? (
+                            <div className="loading-spinner"></div>
+                        ) : recentTasks.length === 0 ? (
+                            <div className="dashboard-no-tasks">No recent tasks.</div>
+                        ) : (
+                            recentTasks.map((task, idx) => (
+                                <div className="dashboard-task-card" key={task._id || idx} style={{marginBottom: 18}}>
+                                    {/* Poster info */}
+                                    {task.postedBy && (
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }} onClick={e => { e.stopPropagation(); navigate(`/user/${task.postedBy._id}`); }}>
+                                        <img
+                                          src={task.postedBy.profilePicture && task.postedBy.profilePicture !== '/default-avatar.png' ? (task.postedBy.profilePicture.startsWith('http') ? task.postedBy.profilePicture : 'http://localhost:5001' + task.postedBy.profilePicture) : '/default-avatar.png'}
+                                          alt={task.postedBy.name || 'Poster'}
+                                          style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '2px solid #eee' }}
+                                        />
+                                        <span style={{ fontWeight: 500, color: '#2563eb', fontSize: 14, textDecoration: 'underline' }}>{task.postedBy.name || 'Task Poster'}</span>
+                                      </div>
+                                    )}
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                        <div className="dashboard-task-title" style={{fontWeight: 600, fontSize: 18}}>{task.title}</div>
+                                        {task.category && <span className="dashboard-task-tag" style={{background: '#eef2ff', color: '#6366f1', fontWeight: 600, borderRadius: 8, padding: '4px 12px', fontSize: 13}}>{task.category}</span>}
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* In Progress Tasks */}
-                        <div className="status-section">
-                            <h3>In Progress</h3>
-                            <hr />
-                            <div className="task-row">
-                                {taskStatusGroups.IN_PROGRESS.map((task) => (
-                                    <div key={task._id} className="task-item" onClick={() => handleTaskClick(task)}>
-
-                                        {/* Tags */}
-                                        <div className="task-tags">
-                                            {task.tags && task.tags.length > 0 ? (
-                                                task.tags.map((tag, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="task-tag clickable"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // Prevent opening the bidding modal
-                                                            if (!selectedTags.includes(tag)) {
-                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
-                                                            }
-                                                        }}
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))
-                                            ) : null}
-                                        </div>
-
-                                        <div className="task-item-header">{task.title}</div>
-                                        <div className="task-item-content">
-                                            <p>{task.description}</p>
-                                            <p>
-                                                <strong>Budget:</strong> ${task.budget}
-                                            </p>
-                                            <p>
-                                                <strong>Deadline:</strong> {formatDate(task.deadline)}
-                                            </p>
-                                        </div>
-
-                                        {/* Category */}
-                                        {task.category && (
-                                            <p className="task-category" 
-                                            onClick={(e) => {  
-                                                e.stopPropagation();  // Prevents the click from triggering parent events  
-                                                setCategoryFilter(task.category);  // Updates the category filter  
-                                            }}>
-                                                {task.category}
-                                            </p>
-                                        )}
-
-                                        <div className="task-status">
-                                            <select
-                                                className="status-dropdown"
-                                                value={task.status}
-                                                onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <option value="PENDING">Pending</option>
-                                                <option value="IN_PROGRESS">In Progress</option>
-                                                <option value="COMPLETED">Completed</option>
-                                            </select>
-                                        </div>
+                                    <div className="dashboard-task-desc" style={{margin: '8px 0', color: '#555'}}>{task.description}</div>
+                                    <div className="dashboard-task-tags" style={{marginBottom: 6}}>
+                                        {task.tags && Array.isArray(task.tags) && task.tags.map((tag, i) => (
+                                            <span className="dashboard-task-tag" key={i}>{tag}</span>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Completed Tasks */}
-                        <div className="status-section">
-                            <h3>Completed</h3>
-                            <hr />
-                            <div className="task-row">
-                                {taskStatusGroups.COMPLETED.map((task) => (
-                                    <div key={task._id} className="task-item" onClick={() => handleTaskClick(task)}>
-
-                                        {/* Tags */}
-                                        <div className="task-tags">
-                                            {task.tags && task.tags.length > 0 ? (
-                                                task.tags.map((tag, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="task-tag clickable"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // Prevent opening the bidding modal
-                                                            if (!selectedTags.includes(tag)) {
-                                                                setSelectedTags([...selectedTags, tag]); // Add tag to filter
-                                                            }
-                                                        }}
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))
-                                            ) : null}
-                                        </div>
-
-                                        <div className="task-item-header">{task.title}</div>
-                                        <div className="task-item-content">
-                                            <p>{task.description}</p>
-                                            <p>
-                                                <strong>Budget:</strong> ${task.budget}
-                                            </p>
-                                            <p>
-                                                <strong>Deadline:</strong> {formatDate(task.deadline)}
-                                            </p>
-                                        </div>
-
-                                        {/* Category */}
-                                        {task.category && (
-                                            <p className="task-category" 
-                                            onClick={(e) => {  
-                                                e.stopPropagation();  // Prevents the click from triggering parent events  
-                                                setCategoryFilter(task.category);  // Updates the category filter  
-                                            }}>
-                                                {task.category}
-                                            </p>
-                                        )}
-
-                                        <div className="task-status">
-                                            <select
-                                                className="status-dropdown"
-                                                value={task.status}
-                                                onChange={(e) => handleStatusChange(task._id, e.target.value)}
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <option value="PENDING">Pending</option>
-                                                <option value="IN_PROGRESS">In Progress</option>
-                                                <option value="COMPLETED">Completed</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            {/* ✅ Modal for Task Details and Bids */}
-                            {selectedTask && (
-                                <div className="modal-overlay" onClick={handleCloseModal}>
-                                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                                        <button className="close-btn" onClick={handleCloseModal}>X</button>
-                                        <h2>{selectedTask.title}</h2>
-                                        <p>{selectedTask.description}</p>
-                                        <p><strong>Budget:</strong> ${selectedTask.budget}</p>
-                                        <p><strong>Deadline:</strong> {formatDate(selectedTask.deadline)}</p>
-
-                                        <center><h3>Bids</h3></center>
-
-                                        {/* Error message */}
-                                        {error && <div className="error-message">{error}</div>}
-
-                                        <hr></hr>
-                                        {(bids && bids.length > 0) ? (
-                                            bids.map((bid) => (
-                                                <div key={bid._id} className="bid-card">
-
-                                                    <p><strong>Bid Amount:</strong> ${bid.bidAmount}</p>
-                                                    <p><strong>Bidder:</strong> {bid.bidder.name}</p>
-                                                    <p><strong>Estimated Completion:</strong> {formatDate(bid.estimatedCompletion)}</p>
-                                                    <p><strong>Message:</strong> {bid.message}</p>
-
-                                                    {/* Display the bid status */}
-                                                    <p style={{ 
-                                                        color: bid.status === 'ACCEPTED' ? 'green' 
-                                                            : bid.status === 'REJECTED' ? 'red' 
-                                                            : 'orange',
-                                                        fontWeight: 'bold'
-                                                    }}>
-                                                        Status: {bid.status}
-                                                    </p>
-
-                                                    {userRole === 'task_poster' && selectedTask.assignedTo === null && (
-                                                        <>
-                                                        {console.log(userRole, selectedTask.assignedTo, selectedTask.status)}
-                                                            {selectedTask.status === 'PENDING' || selectedTask.status === 'IN_PROGRESS' ? (
-                                                                <>
-                                                                    <button className="accept-btn" onClick={() => handleAcceptBid(selectedTask._id, bid._id)}>Accept</button>
-                                                                    <button className="reject-btn" onClick={() => handleRejectBid(selectedTask._id, bid._id)}>Reject</button>
-                                                                </>
-                                                            ) : bid.status === 'ACCEPTED' && selectedTask.status === 'IN_PROGRESS' ? (
-                                                                <button disabled className="accept-btn">Accepted</button>
-                                                            ) : (
-                                                                <button disabled className="rejected-btn">Rejected</button>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <p>No bids yet.</p>
-                                        )}
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14, color: '#888'}}>
+                                        <span style={{fontWeight: 600, color: '#22c55e'}}>{task.budget ? `$${task.budget}` : ''}</span>
+                                        <span>{task.deadline ? new Date(task.deadline).toLocaleDateString() : ''}</span>
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                    </>
-                )}
+                            ))
+                        )}
+                    </div>
+                </section>
+                {/* My Recent Bids */}
+                <section className="dashboard-recent-bids" style={{flex: 1}}>
+                    <div className="dashboard-recent-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <h2>My Recent Bids</h2>
+                        <button className="dashboard-view-all" onClick={() => navigate('/my-bids')}>View All</button>
+                    </div>
+                    <div className="dashboard-recent-list">
+                        {bidsLoading ? (
+                            <div className="loading-spinner"></div>
+                        ) : recentBids.length === 0 ? (
+                            <div className="dashboard-no-tasks" style={{textAlign: 'center', color: '#888', fontSize: 18, padding: '32px 0'}}>
+                                <FaUserCircle size={48} style={{marginBottom: 8, color: '#cbd5e1'}} />
+                                <div>No bids yet</div>
+                                <div style={{fontSize: 15, color: '#aaa'}}>Start bidding on tasks to see them here</div>
+                            </div>
+                        ) : (
+                            recentBids.map((bid, idx) => (
+                                <div className="dashboard-task-card" key={bid._id || idx} style={{marginBottom: 18}}>
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                        <div className="dashboard-task-title" style={{fontWeight: 600, fontSize: 18}}>{bid.task?.title || 'Task'}</div>
+                                        {bid.task?.category && <span className="dashboard-task-tag" style={{background: '#e0f2fe', color: '#0284c7', fontWeight: 600, borderRadius: 8, padding: '4px 12px', fontSize: 13}}>{bid.task.category}</span>}
+                                    </div>
+                                    <div className="dashboard-task-desc" style={{margin: '8px 0', color: '#555'}}>{bid.task?.description || ''}</div>
+                                    <div className="dashboard-task-tags" style={{marginBottom: 6}}>
+                                        {bid.task?.tags && Array.isArray(bid.task.tags) && bid.task.tags.map((tag, i) => (
+                                            <span className="dashboard-task-tag" key={i}>{tag}</span>
+                                        ))}
+                                    </div>
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14, color: '#888'}}>
+                                        <span style={{fontWeight: 600, color: '#22c55e'}}>{bid.bidAmount ? `$${bid.bidAmount}` : ''}</span>
+                                        <span>{bid.createdAt ? new Date(bid.createdAt).toLocaleDateString() : ''}</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </section>
             </div>
         </div>
     );
