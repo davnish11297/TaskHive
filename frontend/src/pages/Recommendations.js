@@ -33,7 +33,7 @@ function Recommendations() {
         }
 
         fetchRecommendations();
-    }, [navigate, userRole]);
+    }, [navigate, fetchRecommendations, userRole]);
 
     // Check if there's a taskId in the URL for freelancer recommendations
     useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import '../Profile.css';
 import { FaUserCircle, FaMapMarkerAlt, FaDollarSign, FaStar, FaTasks } from 'react-icons/fa';
@@ -11,7 +11,6 @@ const OtherUserProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
