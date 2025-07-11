@@ -1,0 +1,391 @@
+.progress-tracker {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.progress-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.progress-header h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.progress-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.progress-text {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.progress-percentage {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.milestones-list {
+  padding: 0;
+}
+
+.milestone-item {
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
+}
+
+.milestone-item:last-child {
+  border-bottom: none;
+}
+
+.milestone-item:hover {
+  background: #f9fafb;
+}
+
+.milestone-item.completed {
+  background: #f0fdf4;
+}
+
+.milestone-item.overdue {
+  background: #fef2f2;
+}
+
+.milestone-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 20px;
+  gap: 12px;
+}
+
+.milestone-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.milestone-toggle:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.milestone-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.milestone-icon {
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.milestone-icon.completed {
+  color: #10b981;
+}
+
+.milestone-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.milestone-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+}
+
+.milestone-item.completed .milestone-title {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+.milestone-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn {
+  color: #3b82f6;
+}
+
+.edit-btn:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.delete-btn {
+  color: #ef4444;
+}
+
+.delete-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.milestone-description {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.milestone-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+}
+
+.milestone-date,
+.milestone-completed {
+  color: #6b7280;
+}
+
+.milestone-date.overdue {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.milestone-completed {
+  color: #10b981;
+}
+
+/* Edit mode styles */
+.milestone-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.milestone-edit-input,
+.milestone-edit-textarea,
+.milestone-edit-date {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.milestone-edit-input:focus,
+.milestone-edit-textarea:focus,
+.milestone-edit-date:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.milestone-edit-textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.milestone-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-btn {
+  background: #10b981;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #059669;
+}
+
+.cancel-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #4b5563;
+}
+
+/* Add milestone section */
+.add-milestone {
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.add-milestone h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.add-milestone-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.add-milestone-input,
+.add-milestone-textarea,
+.add-milestone-date {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.add-milestone-input:focus,
+.add-milestone-textarea:focus,
+.add-milestone-date:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.add-milestone-textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.add-milestone-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-milestone-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.add-milestone-btn:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+.milestone-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.progress-fill {
+  animation: progressFill 0.8s ease-out;
+}
+
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .progress-header {
+    padding: 16px;
+  }
+  
+  .progress-header h3 {
+    font-size: 16px;
+  }
+  
+  .progress-percentage {
+    font-size: 20px;
+  }
+  
+  .milestone-content {
+    padding: 12px 16px;
+  }
+  
+  .milestone-title {
+    font-size: 14px;
+  }
+  
+  .milestone-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .add-milestone {
+    padding: 16px;
+  }
+} 

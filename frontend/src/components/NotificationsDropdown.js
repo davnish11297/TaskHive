@@ -45,7 +45,7 @@ const NotificationsDropdown = () => {
   };
 
   return (
-    <div className="notif-dropdown-root">
+    <div className="notif-dropdown-root notifications-dropdown">
       <button className="notif-bell-btn" onClick={() => setOpen(o => !o)}>
         <FaBell size={22} />
         {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
