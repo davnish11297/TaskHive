@@ -1,4 +1,14 @@
 {
+  "name": "taskhive",
+  "version": "1.0.0",
+  "description": "AI-powered freelance marketplace with smart features",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd backend && npm start",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -7,6 +17,17 @@
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "mongoose": "^8.9.5",
-    "nodemon": "^3.1.9"
-  }
+    "nodemon": "^3.1.9",
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "freelance",
+    "marketplace",
+    "ai",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Davnish Singh",
+  "license": "MIT"
 }
