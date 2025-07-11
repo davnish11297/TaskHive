@@ -17,6 +17,27 @@ function Recommendations() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Move fetchRecommendations above useEffect
+    const fetchRecommendations = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const config = {
+                headers: { Authorization: `Bearer ${token}` }
+            };
+
+            if (userRole === 'freelancer') {
+                // Fetch task recommendations for freelancers
+                const response = await axios.get(`${API_URL}/api/tasks/recommendations/tasks`, config);
+                setTaskRecommendations(response.data.recommendations);
+            }
+
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching recommendations:', error);
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -44,26 +65,6 @@ function Recommendations() {
             fetchFreelancerRecommendations(taskId);
         }
     }, [location.search, userRole]);
-
-    const fetchRecommendations = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const config = {
-                headers: { Authorization: `Bearer ${token}` }
-            };
-
-            if (userRole === 'freelancer') {
-                // Fetch task recommendations for freelancers
-                const response = await axios.get(`${API_URL}/api/tasks/recommendations/tasks`, config);
-                setTaskRecommendations(response.data.recommendations);
-            }
-
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching recommendations:', error);
-            setLoading(false);
-        }
-    };
 
     const fetchFreelancerRecommendations = async (taskId) => {
         try {
