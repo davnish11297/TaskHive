@@ -1,6 +1,10 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5002", {
+const SOCKET_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://your-backend-url.com' 
+  : 'http://localhost:5001';
+
+const socket = io(SOCKET_URL, {
     transports: ["websocket", "polling"],
     reconnectionAttempts: 5,
     timeout: 5000,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaPlusCircle, FaSearch, FaUserCircle, FaLightbulb, FaBrain, FaBars, FaTimes, FaCaretDown } from 'react-icons/fa';
+import { FaPlusCircle, FaSearch, FaUserCircle, FaLightbulb, FaBrain, FaBars, FaTimes, FaCaretDown, FaCalendar, FaTasks, FaUser } from 'react-icons/fa';
 import '../Home.css';
 import NotificationsDropdown from './NotificationsDropdown';
 import { jwtDecode } from 'jwt-decode';
@@ -12,7 +12,9 @@ const Navbar = ({ setIsAuthenticated }) => {
   const { user, setUser } = useUserProfile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFeaturesDropdownOpen, setIsFeaturesDropdownOpen] = useState(false);
+  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const accountDropdownRef = useRef(null);
   
   let userRole = null;
   const token = localStorage.getItem('token');
@@ -33,18 +35,18 @@ const Navbar = ({ setIsAuthenticated }) => {
   const primaryNavLinks = [
     { label: 'Dashboard', path: '/home', icon: <FaSearch /> },
     { label: 'Browse Tasks', path: '/tasks' },
-    ...(userRole === 'task_poster' ? [{ label: 'Post Task', path: '/tasks/create', icon: <FaPlusCircle /> }] : []),
   ];
 
   const featuresNavLinks = [
+    { label: 'Calendar', path: '/calendar', icon: <FaCalendar /> },
     { label: 'Recommendations', path: '/recommendations', icon: <FaLightbulb /> },
     { label: 'Smart Features', path: '/smart-features', icon: <FaBrain /> },
   ];
 
-  const userNavLinks = [
-    { label: 'My Tasks', path: '/my-tasks' },
+  const accountNavLinks = [
+    { label: 'My Tasks', path: '/my-tasks', icon: <FaTasks /> },
     { label: 'My Bids', path: '/my-bids' },
-    { label: 'Profile', path: '/profile' },
+    { label: 'Profile', path: '/profile', icon: <FaUser /> },
   ];
 
   // Profile image logic
@@ -56,11 +58,14 @@ const Navbar = ({ setIsAuthenticated }) => {
 
   const isActive = (path) => location.pathname === path;
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsFeaturesDropdownOpen(false);
+      }
+      if (accountDropdownRef.current && !accountDropdownRef.current.contains(event.target)) {
+        setIsAccountDropdownOpen(false);
       }
     };
 
@@ -71,7 +76,7 @@ const Navbar = ({ setIsAuthenticated }) => {
   }, []);
 
   return (
-    <nav className="dashboard-navbar">
+    <nav className="dashboard-navbar navbar">
       <div className="dashboard-logo" onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
         <img src="/taskhive-logo.png" alt="TaskHive Logo" className="dashboard-logo-img" />
         <span className="dashboard-logo-text">TaskHive</span>
@@ -90,6 +95,17 @@ const Navbar = ({ setIsAuthenticated }) => {
             {link.label}
           </button>
         ))}
+
+        {/* Post Task Button (if task poster) */}
+        {userRole === 'task_poster' && (
+          <button
+            className="dashboard-nav-btn post-task-btn"
+            onClick={() => navigate('/tasks/create')}
+          >
+            <FaPlusCircle style={{ marginRight: 6 }} />
+            Post Task
+          </button>
+        )}
 
         {/* Features Dropdown */}
         <div className="nav-dropdown" ref={dropdownRef}>
@@ -119,18 +135,6 @@ const Navbar = ({ setIsAuthenticated }) => {
             </div>
           )}
         </div>
-
-        {/* User Navigation */}
-        {userNavLinks.map((link) => (
-          <button
-            key={link.label}
-            className={`dashboard-nav-btn${isActive(link.path) ? ' active' : ''}`}
-            onClick={() => navigate(link.path)}
-          >
-            {link.icon && <span style={{ marginRight: 6 }}>{link.icon}</span>}
-            {link.label}
-          </button>
-        ))}
       </div>
 
       {/* Mobile Menu Button */}
@@ -144,14 +148,47 @@ const Navbar = ({ setIsAuthenticated }) => {
       {/* Right Side Items */}
       <div className="navbar-right navbar-icons-flex">
         <NotificationsDropdown />
-        <div className="dashboard-profile-icon" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
-          {user && user.profilePicture ? (
-            <img src={profilePic} alt="Profile" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e0e7ef' }} />
-          ) : (
-            <FaUserCircle size={32} />
+        
+        {/* Account Dropdown */}
+        <div className="nav-dropdown account-dropdown" ref={accountDropdownRef}>
+          <button
+            className="dashboard-nav-btn dropdown-toggle account-toggle"
+            onClick={() => setIsAccountDropdownOpen(!isAccountDropdownOpen)}
+          >
+            <div className="profile-pic-container">
+              {user && user.profilePicture ? (
+                <img src={profilePic} alt="Profile" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e0e7ef' }} />
+              ) : (
+                <FaUserCircle size={24} />
+              )}
+            </div>
+            <FaCaretDown style={{ marginLeft: 4, fontSize: '12px' }} />
+          </button>
+          {isAccountDropdownOpen && (
+            <div className="dropdown-menu account-menu">
+              {accountNavLinks.map((link) => (
+                <button
+                  key={link.label}
+                  className={`dropdown-item${isActive(link.path) ? ' active' : ''}`}
+                  onClick={() => {
+                    navigate(link.path);
+                    setIsAccountDropdownOpen(false);
+                  }}
+                >
+                  {link.icon && <span style={{ marginRight: 8 }}>{link.icon}</span>}
+                  {link.label}
+                </button>
+              ))}
+              <div className="dropdown-divider"></div>
+              <button
+                className="dropdown-item logout-item"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
           )}
         </div>
-        <button className="dashboard-logout-btn" onClick={handleLogout} style={{ marginLeft: 18, background: '#fff', border: '1px solid #e0e7ef', borderRadius: 8, padding: '7px 18px', fontWeight: 500, color: '#1cb98a', cursor: 'pointer', transition: 'background 0.15s, color 0.15s' }}>Logout</button>
       </div>
 
       {/* Mobile Navigation Menu */}
@@ -172,6 +209,18 @@ const Navbar = ({ setIsAuthenticated }) => {
                 {link.label}
               </button>
             ))}
+            {userRole === 'task_poster' && (
+              <button
+                className="mobile-nav-item post-task-btn"
+                onClick={() => {
+                  navigate('/tasks/create');
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <FaPlusCircle style={{ marginRight: 8 }} />
+                Post Task
+              </button>
+            )}
           </div>
 
           <div className="mobile-nav-section">
@@ -193,7 +242,7 @@ const Navbar = ({ setIsAuthenticated }) => {
 
           <div className="mobile-nav-section">
             <h4>Account</h4>
-            {userNavLinks.map((link) => (
+            {accountNavLinks.map((link) => (
               <button
                 key={link.label}
                 className={`mobile-nav-item${isActive(link.path) ? ' active' : ''}`}
@@ -206,6 +255,15 @@ const Navbar = ({ setIsAuthenticated }) => {
                 {link.label}
               </button>
             ))}
+            <button
+              className="mobile-nav-item logout-item"
+              onClick={() => {
+                handleLogout();
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Logout
+            </button>
           </div>
         </div>
       )}

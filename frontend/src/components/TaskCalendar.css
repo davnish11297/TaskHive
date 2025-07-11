@@ -1,0 +1,581 @@
+/* Task Calendar Styles */
+.task-calendar {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.calendar-header h2 {
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.calendar-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-select:hover {
+  border-color: var(--primary-color);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.create-event-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.create-event-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.calendar-container {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+/* React Big Calendar Customization */
+.rbc-calendar {
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+.rbc-header {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rbc-month-view {
+  border: none;
+}
+
+.rbc-month-row {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rbc-date-cell {
+  padding: 8px;
+  color: var(--text-primary);
+}
+
+.rbc-day-bg {
+  background: var(--bg-secondary);
+  transition: background-color 0.2s ease;
+}
+
+.rbc-day-bg:hover {
+  background: var(--bg-hover);
+}
+
+.rbc-off-range-bg {
+  background: var(--bg-muted);
+}
+
+.rbc-off-range {
+  color: var(--text-muted);
+}
+
+.rbc-today {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+.rbc-event {
+  background: var(--primary-color);
+  border: none;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rbc-event:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-event-content {
+  color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Event type specific colors */
+.calendar-event-task_deadline {
+  background: #EF4444 !important;
+}
+
+.calendar-event-milestone {
+  background: #10B981 !important;
+}
+
+.calendar-event-meeting {
+  background: #3B82F6 !important;
+}
+
+.calendar-event-custom {
+  background: #8B5CF6 !important;
+}
+
+/* Week and Day view */
+.rbc-time-view {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.rbc-time-header {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rbc-time-content {
+  background: var(--bg-secondary);
+}
+
+.rbc-timeslot-group {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rbc-time-slot {
+  border-top: 1px solid var(--border-color);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 41, 59, 0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-modal, .modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  z-index: 2001;
+  min-width: 350px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .event-modal, .modal-content {
+    padding: 1rem 0.5rem;
+    min-width: 90vw;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.modal-content {
+  padding: 24px;
+}
+
+.event-details {
+  color: var(--text-primary);
+}
+
+.event-info p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.event-info strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.meeting-details {
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.attendees {
+  margin: 16px 0;
+}
+
+.attendees ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.attendees li {
+  padding: 4px 0;
+  color: var(--text-secondary);
+}
+
+.task-link {
+  margin: 16px 0;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+/* Form Styles */
+.create-event-form {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.color-input {
+  width: 60px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+}
+
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 20px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 0 0 12px 12px;
+}
+
+.edit-btn,
+.save-btn,
+.create-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn:hover,
+.save-btn:hover,
+.create-btn:hover {
+  background: var(--primary-hover);
+}
+
+.delete-btn {
+  background: #EF4444;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #DC2626;
+}
+
+.cancel-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: var(--bg-hover);
+}
+
+/* Loading and Error States */
+.calendar-loading,
+.calendar-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.retry-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: var(--primary-hover);
+}
+
+/* Edit Form Styles */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .task-calendar {
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .calendar-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .calendar-controls {
+    justify-content: space-between;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+
+  .event-modal {
+    margin: 20px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .filter-select,
+  .create-event-btn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .rbc-event {
+    font-size: 11px;
+    padding: 1px 3px;
+  }
+}
+
+/* Dark mode specific adjustments */
+@media (prefers-color-scheme: dark) {
+  .rbc-calendar {
+    background: var(--bg-secondary);
+  }
+
+  .rbc-month-view,
+  .rbc-time-view {
+    background: var(--bg-secondary);
+  }
+
+  .rbc-day-bg {
+    background: var(--bg-secondary);
+  }
+
+  .rbc-off-range-bg {
+    background: var(--bg-muted);
+  }
+}
+
+/* Print styles */
+@media print {
+  .calendar-controls,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  .task-calendar {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .rbc-calendar {
+    background: white !important;
+    color: black !important;
+  }
+} 
